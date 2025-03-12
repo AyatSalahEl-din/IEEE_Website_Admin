@@ -9,8 +9,12 @@ import 'package:ieee_website/Home_screen/home_screen.dart';
 import 'package:ieee_website/Join_us/join.dart';
 import 'package:ieee_website/Projects/projects.dart';
 import 'package:ieee_website/Themes/my_theme.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
