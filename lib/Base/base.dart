@@ -5,6 +5,7 @@ import 'package:ieee_website/Contact_us/contact.dart';
 import 'package:ieee_website/Events/events.dart';
 import 'package:ieee_website/FAQ/faq.dart';
 import 'package:ieee_website/Home_screen/home_screen.dart';
+import 'package:ieee_website/Home_screen/members/models/url_helper.dart';
 import 'package:ieee_website/Join_us/join.dart';
 import 'package:ieee_website/Projects/projects.dart';
 import 'package:ieee_website/Themes/website_colors.dart';
@@ -53,7 +54,7 @@ class _BaseState extends State<Base> with SingleTickerProviderStateMixin {
         title: Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.0.sp),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // IEEE Logo
               Image.asset(
@@ -77,28 +78,6 @@ class _BaseState extends State<Base> with SingleTickerProviderStateMixin {
                   Tab(text: "Contact Us"),
                   Tab(text: "FAQ"),
                 ],
-              ),
-
-              // "Join Us" Button
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: WebsiteColors.whiteColor,
-                  foregroundColor: WebsiteColors.primaryBlueColor,
-                  fixedSize: Size(170.sp, 50.sp),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => JoinUs()),
-                  );
-                },
-                child: Text(
-                  'Join Us',
-                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                    fontSize: 20.sp,
-                    color: WebsiteColors.primaryBlueColor,
-                  ),
-                ),
               ),
             ],
           ),
