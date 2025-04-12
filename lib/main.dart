@@ -7,6 +7,7 @@ import 'package:ieee_website/Events/events.dart';
 import 'package:ieee_website/FAQ/faq.dart';
 import 'package:ieee_website/Home_screen/home_screen.dart';
 import 'package:ieee_website/Join_us/join.dart';
+import 'package:ieee_website/Login/login.dart';
 import 'package:ieee_website/Projects/projects.dart';
 import 'package:ieee_website/Themes/my_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -32,8 +33,9 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'IEEE PUA SB',
           theme: MyTheme.theme,
-          initialRoute: Base.routeName,
+          initialRoute: LoginScreen.routeName,
           routes: {
+            LoginScreen.routeName: (context) => LoginScreen(),
             HomeScreen.routeName: (context) => HomeScreen(),
             AboutUs.routeName: (context) => AboutUs(),
             Events.routeName: (context) => Events(),

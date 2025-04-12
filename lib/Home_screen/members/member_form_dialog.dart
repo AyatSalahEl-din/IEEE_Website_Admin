@@ -116,7 +116,7 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
                     style: Theme.of(context).textTheme.displayMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       fontSize: 35.sp,
-                      color: Colors.red,
+                      color: WebsiteColors.redColor,
                     ),
                   ),
                 ],
@@ -131,12 +131,12 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
                     style: Theme.of(context).textTheme.displayMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       fontSize: 35.sp,
-                      color: Colors.red,
+                      color: WebsiteColors.redColor,
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 20.h),
               ElevatedButton(
                 onPressed: saveMember,
                 child: Text(
