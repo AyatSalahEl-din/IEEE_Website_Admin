@@ -12,7 +12,12 @@
           "package_name": "com.example.ieee_website"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "559475050011-ueom7opa2bi61k827p9ha2gr1ogl1ofi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyA1leuibJJAgSHnk-nfqluOA5zp3bSsQwQ"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "559475050011-ueom7opa2bi61k827p9ha2gr1ogl1ofi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     },
@@ -31,7 +41,12 @@
           "package_name": "com.example.ieee_website_admin"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "559475050011-ueom7opa2bi61k827p9ha2gr1ogl1ofi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyA1leuibJJAgSHnk-nfqluOA5zp3bSsQwQ"
@@ -39,7 +54,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "559475050011-ueom7opa2bi61k827p9ha2gr1ogl1ofi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

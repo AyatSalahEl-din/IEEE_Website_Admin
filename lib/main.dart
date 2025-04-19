@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
           routes: {
             HomeScreen.routeName: (context) => HomeScreen(),
             AboutUs.routeName: (context) => AboutUs(),
-            Events.routeName: (context) => Events(),
+            AdminEventPage.routeName: (context) => AdminEventPage(),
             Projects.routeName: (context) => Projects(),
             Contact.routeName: (context) => Contact(),
             JoinUs.routeName: (context) => JoinUs(),

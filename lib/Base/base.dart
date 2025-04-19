@@ -105,7 +105,7 @@ class _BaseState extends State<Base> with SingleTickerProviderStateMixin {
         children: [
           HomeScreen(tabController: _tabController),
           AboutUs(tabController: _tabController),
-          Events(tabController: _tabController),
+          AdminEventPage(tabController: _tabController),
           Projects(
             tabController: _tabController,
           ), // Pass TabController to Projects
