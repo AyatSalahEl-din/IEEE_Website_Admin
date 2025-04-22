@@ -41,32 +41,18 @@ void addEvent({
   required String? selectedApp,
 }) async {
   if (!formKey.currentState!.validate()) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please fill all required fields.')),
+    );
     return;
   }
+
   setLoading(true);
 
   try {
-    // Convert category to uppercase
-    final category = categoryController.text.trim().toUpperCase();
-
-    // Check if the category already exists in Firestore
-    final existingCategories =
-        await FirebaseFirestore.instance
-            .collection('events')
-            .where('category', isEqualTo: category)
-            .get();
-
-    if (existingCategories.docs.isNotEmpty) {
-      // If the category exists, use the existing category name
-      categoryController.text = existingCategories.docs.first['category'];
-    } else {
-      // Otherwise, save the category in uppercase
-      categoryController.text = category;
-    }
-
     final eventData = {
       'name': nameController.text.trim(),
-      'category': categoryController.text.trim(),
+      'category': categoryController.text.trim().toUpperCase(),
       'details': descriptionController.text.trim(),
       'location': locationController.text.trim(),
       'time': timeController.text.trim(),
@@ -82,12 +68,10 @@ void addEvent({
                 ? appNameController.text.trim()
                 : selectedApp,
       },
-      if (!isOnlineEvent &&
-          selectedDate != null &&
-          selectedDate.isAfter(DateTime.now())) ...{
+      if (!isOnlineEvent) ...{
         'ticketPrice':
             double.tryParse(ticketPriceController.text.trim()) ?? 0.0,
-        'discount': discountController.text.trim(),
+        'discount': double.tryParse(discountController.text.trim()) ?? 0.0,
         'discountFor': discountForController.text.trim(),
         'isTicketAvailable': isTicketAvailable,
         'isTicketLimited': isTicketLimited,
@@ -95,8 +79,8 @@ void addEvent({
         'busDetails':
             isBusAvailable
                 ? {
-                  'numberOfBuses': numberOfBuses,
-                  'seatsPerBus': seatsPerBus,
+                  'numberOfBuses': numberOfBuses ?? 0,
+                  'seatsPerBus': seatsPerBus ?? 0,
                   'isSeatBookingAvailable': isSeatBookingAvailable,
                   'ticketPrice':
                       double.tryParse(busTicketPriceController.text.trim()) ??
@@ -105,7 +89,6 @@ void addEvent({
                   'source': busSourceController.text.trim(),
                   'destination': busDestinationController.text.trim(),
                   'tripExplanation': tripExplanationController.text.trim(),
-                  'isAvailableForBooking': isBusAvailable,
                   'departureTime': busDepartureTimeController.text.trim(),
                   'arrivalTime': busArrivalTimeController.text.trim(),
                 }
@@ -120,15 +103,14 @@ void addEvent({
     await FirebaseFirestore.instance.collection('events').add(eventData);
 
     resetForm();
-    setLoading(false);
-
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text('Event added successfully!')));
   } catch (e) {
-    setLoading(false);
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(SnackBar(content: Text('Error: $e')));
+    ).showSnackBar(SnackBar(content: Text('Error adding event: $e')));
+  } finally {
+    setLoading(false);
   }
 }

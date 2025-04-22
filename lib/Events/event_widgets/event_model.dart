@@ -11,27 +11,24 @@ class Event {
   final DateTime date;
   final String category;
   final String details;
-
-  // Optional fields from the first model
-  //final String? description;
-  //final String? coverImageUrl;
-  //final String? additionalDetails;
-  final double? baseTicketPrice;
-  final bool? discountOption;
-  final double? discountAmount;
-  final DateTime? discountValidUntil;
-  final bool? hasBusService;
-  final BusDetails? busDetails;
-  final List<String>? galleryImages;
-  final bool? isPastEvent;
-  final bool? isTicketAvailable;
-  final bool? isTicketLimited;
-  final int? ticketLimit;
-  final int? numberOfBuses;
-  final int? seatsPerBus;
-  final bool? isSeatBookingAvailable;
+  final double? discount; // Discount amount
+  final String? discountFor; // Group eligible for discount
+  final double? baseTicketPrice; // Base ticket price
+  final bool isOnlineEvent; // Whether the event is online
+  final String? appName; // Online event app name
+  final String? appUrl; // Online event URL
+  final String? appTime; // Online event time
+  final BusDetails? busDetails; // Bus details for the event
+  final String? contactNumber; // Admin-provided contact number
+  final String? contactEmail; // Admin-provided contact email
+  final bool? isTicketAvailable; // Whether tickets are available
+  final bool? isTicketLimited; // Whether tickets are limited
+  final int? ticketLimit; // Ticket limit if applicable
+  final bool? hasBusService; // Whether the event has bus service
+  final bool? isSeatBookingAvailable; // Whether seat booking is available
 
   Event({
+    required this.id,
     required this.name,
     required this.location,
     required this.time,
@@ -40,105 +37,155 @@ class Event {
     required this.date,
     required this.category,
     required this.details,
-    this.id = '',
-    //this.description,
-    //this.coverImageUrl,
-    //this.additionalDetails,
+    this.discount,
+    this.discountFor,
     this.baseTicketPrice,
-    this.discountOption,
-    this.discountAmount,
-    this.discountValidUntil,
-    this.hasBusService,
+    this.isOnlineEvent = false,
+    this.appName,
+    this.appUrl,
+    this.appTime,
     this.busDetails,
-    this.galleryImages,
-    this.isPastEvent,
+    this.contactNumber,
+    this.contactEmail,
     this.isTicketAvailable,
     this.isTicketLimited,
     this.ticketLimit,
-    this.numberOfBuses,
-    this.seatsPerBus,
+    this.hasBusService,
     this.isSeatBookingAvailable,
   });
 
   factory Event.fromFirestore(DocumentSnapshot doc) {
-    Map data = doc.data() as Map;
+    Map data = doc.data() as Map<String, dynamic>;
     return Event(
       id: doc.id,
-      name: data['name'] ?? 'No name',
-      location: data['location'] ?? 'No location',
-      time: data['time'] ?? 'No time',
+      name: data['name'] ?? '',
+      location: data['location'] ?? '',
+      time: data['time'] ?? '',
       imageUrls:
           (data['imageUrls'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
-      month: data['month'] ?? 'No month',
+      month: data['month'] ?? '',
       date: (data['date'] as Timestamp).toDate(),
-      category: data['category'] ?? 'No category',
-      details: data['details'] ?? 'No details',
-      //description: data['description'],
-      //coverImageUrl: data['coverImageUrl'],
-      //additionalDetails: data['additionalDetails'],
-      baseTicketPrice: data['baseTicketPrice']?.toDouble(),
-      discountOption: data['discountOption'],
-      discountAmount: data['discountAmount']?.toDouble(),
-      discountValidUntil: data['discountValidUntil']?.toDate(),
-      hasBusService: data['hasBusService'],
+      category: data['category'] ?? '',
+      details: data['details'] ?? '',
+      discount: (data['discount'] ?? 0).toDouble(),
+      discountFor: data['discountFor'],
+      baseTicketPrice: (data['ticketPrice'] ?? 0).toDouble(),
+      isOnlineEvent: data['isOnlineEvent'] ?? false,
+      appName: data['appName'],
+      appUrl: data['appUrl'],
+      appTime: data['appTime'],
       busDetails:
           data['busDetails'] != null
               ? BusDetails.fromMap(data['busDetails'])
               : null,
-      galleryImages:
-          data['galleryImages'] != null
-              ? List<String>.from(data['galleryImages'])
-              : null,
-      isPastEvent: data['isPastEvent'],
+      contactNumber: data['contact']?['number'],
+      contactEmail: data['contact']?['email'],
       isTicketAvailable: data['isTicketAvailable'],
       isTicketLimited: data['isTicketLimited'],
       ticketLimit: data['ticketLimit'],
-      numberOfBuses: data['busDetails']?['numberOfBuses'],
-      seatsPerBus: data['busDetails']?['seatsPerBus'],
-      isSeatBookingAvailable: data['busDetails']?['isSeatBookingAvailable'],
+      hasBusService: data['hasBusService'],
+      isSeatBookingAvailable: data['isSeatBookingAvailable'],
     );
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'name': name,
+      'location': location,
+      'time': time,
+      'imageUrls': imageUrls,
+      'month': month,
+      'date': date,
+      'category': category,
+      'details': details,
+      if (discount != null) 'discount': discount,
+      if (discountFor != null) 'discountFor': discountFor,
+      if (baseTicketPrice != null) 'ticketPrice': baseTicketPrice,
+      'isOnlineEvent': isOnlineEvent,
+      if (appName != null) 'appName': appName,
+      if (appUrl != null) 'appUrl': appUrl,
+      if (appTime != null) 'appTime': appTime,
+      if (busDetails != null) 'busDetails': busDetails!.toMap(),
+      'contact': {
+        if (contactNumber != null) 'number': contactNumber,
+        if (contactEmail != null) 'email': contactEmail,
+      },
+      'isTicketAvailable': isTicketAvailable,
+      'isTicketLimited': isTicketLimited,
+      'ticketLimit': ticketLimit,
+      'hasBusService': hasBusService,
+      'isSeatBookingAvailable': isSeatBookingAvailable,
+    };
   }
 
   String formatDate() {
     return DateFormat('yyyy-MM-dd HH:mm').format(date);
+  }
+
+  /// Generate Bus Details as a formatted string
+  String getBusDetails() {
+    if (busDetails == null) return '';
+    return '''
+Bus Details:
+- Departure Location: ${busDetails!.departureLocation}
+- Arrival Location: ${busDetails!.arrivalLocation}
+- Departure Time: ${busDetails!.departureTime}
+''';
+  }
+
+  /// Generate Online Event Details as a formatted string
+  String getOnlineEventDetails() {
+    if (!isOnlineEvent) return '';
+    return '''
+Online Event Details:
+- App: ${appName ?? 'Not provided'}
+- URL: ${appUrl ?? 'Not provided'}
+- Time: ${appTime ?? 'Not provided'}
+''';
+  }
+
+  /// Generate Contact Details as a formatted string
+  String getContactDetails() {
+    return '''
+Contact Details:
+- Phone: ${contactNumber ?? 'Not provided'}
+- Email: ${contactEmail ?? 'Not provided'}
+''';
   }
 }
 
 class BusDetails {
   final String departureLocation;
   final String arrivalLocation;
-  final String tripProgram;
+  final String departureTime;
   final double busTicketPrice;
-  final int totalSeats;
-  final bool enableSeatSelection;
-  final String? departureTime;
-  final String? arrivalTime;
 
   BusDetails({
     required this.departureLocation,
     required this.arrivalLocation,
-    required this.tripProgram,
+    required this.departureTime,
     required this.busTicketPrice,
-    required this.totalSeats,
-    required this.enableSeatSelection,
-    this.departureTime,
-    this.arrivalTime,
   });
 
-  factory BusDetails.fromMap(Map data) {
+  factory BusDetails.fromMap(Map<String, dynamic> data) {
     return BusDetails(
       departureLocation: data['departureLocation'] ?? '',
       arrivalLocation: data['arrivalLocation'] ?? '',
-      tripProgram: data['tripProgram'] ?? '',
-      busTicketPrice: (data['busTicketPrice'] ?? 0).toDouble(),
-      totalSeats: (data['totalSeats'] ?? 0).toInt(),
-      enableSeatSelection: data['enableSeatSelection'] ?? false,
-      departureTime: data['departureTime'],
-      arrivalTime: data['arrivalTime'],
+      departureTime: data['departureTime'] ?? '',
+      busTicketPrice: (data['ticketPrice'] ?? 0).toDouble(),
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'departureLocation': departureLocation,
+      'arrivalLocation': arrivalLocation,
+      'departureTime': departureTime,
+      'ticketPrice': busTicketPrice,
+    };
   }
 }
 

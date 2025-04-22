@@ -115,8 +115,8 @@ class _EditEventPageState extends State<EditEventPage> {
     _isSeatBookingAvailable =
         widget.eventData['busDetails']?['isSeatBookingAvailable'] ?? false;
     _ticketLimit = widget.eventData['ticketLimit'];
-    _numberOfBuses = widget.eventData['busDetails']?['numberOfBuses'];
-    _seatsPerBus = widget.eventData['busDetails']?['seatsPerBus'];
+    _numberOfBuses = widget.eventData['busDetails']?['numberOfBuses'] ?? 0;
+    _seatsPerBus = widget.eventData['busDetails']?['seatsPerBus'] ?? 0;
     _isOnlineEvent = widget.eventData['isOnlineEvent'] ?? false;
     _appTimeController = TextEditingController(
       text: widget.eventData['appTime'] ?? '',
@@ -124,7 +124,16 @@ class _EditEventPageState extends State<EditEventPage> {
     _appUrlController = TextEditingController(
       text: widget.eventData['appUrl'] ?? '',
     );
-    _selectedApp = widget.eventData['appName'] ?? '';
+    final appName = widget.eventData['appName'];
+    if (appName != null &&
+        ['Zoom', 'Microsoft Teams', 'Google Meet', 'Other'].contains(appName)) {
+      _selectedApp = appName;
+    } else if (appName != null) {
+      _selectedApp = 'Other';
+      _appNameController.text = appName; // Set the custom app name
+    } else {
+      _selectedApp = null; // Default to null if no app is selected
+    }
     _appNameController = TextEditingController(
       text: _selectedApp == 'Other' ? widget.eventData['appName'] : '',
     );
@@ -162,59 +171,72 @@ class _EditEventPageState extends State<EditEventPage> {
         _categoryController.text = category;
       }
 
+      // Prepare the updated data
       final updatedData = {
-        'name': _nameController.text,
+        'name': _nameController.text.trim(),
         'category': _categoryController.text.trim(),
-        'details': _descriptionController.text,
-        'location': _locationController.text,
-        'time': _timeController.text,
-        'date': _selectedDate,
-        'month': DateFormat.MMMM().format(_selectedDate!),
-        'imageUrls': _imageUrls,
-        'ticketPrice':
-            double.tryParse(_ticketPriceController.text.trim()) ?? 0.0,
-        'discount': _discountController.text.trim(),
-        'discountFor': _discountForController.text.trim(),
-        'isTicketAvailable': _isTicketAvailable,
-        'isTicketLimited': _isTicketLimited,
-        'ticketLimit': _isTicketLimited ? _ticketLimit : null,
-        'busDetails':
-            _isBusAvailable
-                ? {
-                  'numberOfBuses': _numberOfBuses,
-                  'seatsPerBus': _seatsPerBus,
-                  'isSeatBookingAvailable': _isSeatBookingAvailable,
-                  'ticketPrice':
-                      double.tryParse(_busTicketPriceController.text.trim()) ??
-                      0.0,
-                  'seats': int.tryParse(_busSeatsController.text.trim()) ?? 0,
-                  'source': _busSourceController.text.trim(),
-                  'destination': _busDestinationController.text.trim(),
-                  'tripExplanation': _tripExplanationController.text.trim(),
-                  'departureTime': _busDepartureTimeController.text.trim(),
-                  'arrivalTime': _busArrivalTimeController.text.trim(),
-                }
+        'details': _descriptionController.text.trim(),
+        'location': _locationController.text.trim(),
+        'time': _timeController.text.trim(),
+        'date':
+            _selectedDate != null ? Timestamp.fromDate(_selectedDate!) : null,
+        'month':
+            _selectedDate != null
+                ? DateFormat.MMMM().format(_selectedDate!)
                 : null,
+        'imageUrls': _imageUrls,
+        'isOnlineEvent': _isOnlineEvent,
+        if (_isOnlineEvent) ...{
+          'appTime': _appTimeController.text.trim(),
+          'appUrl': _appUrlController.text.trim(),
+          'appName':
+              _selectedApp == 'Other'
+                  ? _appNameController.text.trim()
+                  : _selectedApp,
+        },
+        if (!_isOnlineEvent) ...{
+          'ticketPrice':
+              double.tryParse(_ticketPriceController.text.trim()) ?? 0.0,
+          'discount': _discountController.text.trim(),
+          'discountFor': _discountForController.text.trim(),
+          'isTicketAvailable': _isTicketAvailable,
+          'isTicketLimited': _isTicketLimited,
+          'ticketLimit': _isTicketLimited ? _ticketLimit : null,
+          'busDetails':
+              _isBusAvailable
+                  ? {
+                    'numberOfBuses':
+                        _numberOfBuses ?? 0, // Ensure this is saved
+                    'seatsPerBus': _seatsPerBus ?? 0, // Ensure this is saved
+                    'isSeatBookingAvailable': _isSeatBookingAvailable,
+                    'ticketPrice':
+                        double.tryParse(
+                          _busTicketPriceController.text.trim(),
+                        ) ??
+                        0.0,
+                    'seats': int.tryParse(_busSeatsController.text.trim()) ?? 0,
+                    'source': _busSourceController.text.trim(),
+                    'destination': _busDestinationController.text.trim(),
+                    'tripExplanation': _tripExplanationController.text.trim(),
+                    'departureTime': _busDepartureTimeController.text.trim(),
+                    'arrivalTime': _busArrivalTimeController.text.trim(),
+                  }
+                  : null,
+        },
         'contact': {
           'number': _contactNumberController.text.trim(),
           'email': _contactEmailController.text.trim(),
         },
-        'isOnlineEvent': _isOnlineEvent,
-        'appTime': _appTimeController.text.trim(),
-        'appUrl': _appUrlController.text.trim(),
-        'appName':
-            _selectedApp == 'Other'
-                ? _appNameController.text.trim()
-                : _selectedApp,
       };
 
+      // Update the event in Firestore
       await FirebaseFirestore.instance
           .collection('events')
           .doc(widget.eventId)
           .update(updatedData);
 
       setState(() => _isLoading = false);
-      if (mounted) Navigator.pop(context); // go back after saving
+      if (mounted) Navigator.pop(context); // Go back after saving
     } catch (e) {
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(
@@ -313,33 +335,32 @@ class _EditEventPageState extends State<EditEventPage> {
                 labelText: "Event Name",
                 icon: Icons.event,
               ),
-              SizedBox(height: 25.sp),
+              SizedBox(height: 20.sp), // Add spacing
               CustomTextFormField(
                 controller: _categoryController,
                 labelText: "Category",
                 icon: Icons.category,
               ),
-              SizedBox(height: 25.sp),
+              SizedBox(height: 20.sp), // Add spacing
               CustomTextFormField(
                 controller: _descriptionController,
                 labelText: "Description",
                 icon: Icons.description,
                 isMultiline: true,
               ),
-              SizedBox(height: 25.sp),
+              SizedBox(height: 20.sp), // Add spacing
               CustomTextFormField(
                 controller: _locationController,
                 labelText: "Location",
                 icon: Icons.location_on,
               ),
-              SizedBox(height: 25.sp),
+              SizedBox(height: 20.sp), // Add spacing
               CustomTextFormField(
                 controller: _timeController,
                 labelText: "Time",
                 icon: Icons.access_time,
               ),
-              SizedBox(height: 25.sp),
-
+              SizedBox(height: 20.sp), // Add spacing
               // Use CustomDatePicker widget here
               CustomDatePicker(
                 initialDate: _selectedDate,
@@ -349,8 +370,7 @@ class _EditEventPageState extends State<EditEventPage> {
                   });
                 },
               ),
-
-              const SizedBox(height: 20),
+              SizedBox(height: 20.sp), // Add spacing
 
               if (_imageUrls.isNotEmpty)
                 GridView.builder(
@@ -404,12 +424,11 @@ class _EditEventPageState extends State<EditEventPage> {
                     );
                   },
                 ),
-              const SizedBox(height: 16),
-
+              if (_imageUrls.isNotEmpty) SizedBox(height: 20.sp), // Add spacing
               // Add Image Button
               CustomElevatedButton(label: '+ Add Image', onPressed: _addImage),
+              SizedBox(height: 20.sp), // Add spacing
 
-              const SizedBox(height: 24),
               SwitchListTile(
                 title: const Text('Is Online Event?'),
                 value: _isOnlineEvent,
@@ -424,16 +443,19 @@ class _EditEventPageState extends State<EditEventPage> {
                 },
               ),
               if (_isOnlineEvent) ...[
+                SizedBox(height: 20.sp),
                 CustomTextFormField(
                   controller: _appTimeController,
                   labelText: 'Exact Time',
                   icon: Icons.access_time,
                 ),
+                SizedBox(height: 20.sp),
                 CustomTextFormField(
                   controller: _appUrlController,
                   labelText: 'Pre-URL (Optional)',
                   icon: Icons.link,
                 ),
+                SizedBox(height: 20.sp),
                 DropdownButtonFormField<String>(
                   value: _selectedApp,
                   items:
@@ -445,6 +467,9 @@ class _EditEventPageState extends State<EditEventPage> {
                   onChanged: (value) {
                     setState(() {
                       _selectedApp = value;
+                      if (value != 'Other') {
+                        _appNameController.clear(); // Clear custom app name
+                      }
                     });
                   },
                   decoration: InputDecoration(
@@ -454,14 +479,17 @@ class _EditEventPageState extends State<EditEventPage> {
                     ),
                   ),
                 ),
-                if (_selectedApp == 'Other')
+                if (_selectedApp == 'Other') ...[
+                  SizedBox(height: 20.sp), // Add spacing
                   CustomTextFormField(
                     controller: _appNameController,
                     labelText: 'App Name',
                     icon: Icons.apps,
                   ),
+                ],
               ],
               if (!_isOnlineEvent) ...[
+                SizedBox(height: 20.sp), // Add spacing
                 SwitchListTile(
                   title: const Text('Are Tickets Available?'),
                   value: _isTicketAvailable,
@@ -476,6 +504,7 @@ class _EditEventPageState extends State<EditEventPage> {
                   },
                 ),
                 if (_isTicketAvailable) ...[
+                  SizedBox(height: 20.sp), // Add spacing
                   SwitchListTile(
                     title: const Text('Are Tickets Limited?'),
                     value: _isTicketLimited,
@@ -493,21 +522,25 @@ class _EditEventPageState extends State<EditEventPage> {
                       labelText: 'Ticket Limit',
                       icon: Icons.confirmation_number,
                     ),
+                  SizedBox(height: 20.sp), // Add spacing
                   CustomTextFormField(
                     controller: _ticketPriceController,
                     labelText: 'Ticket Price',
                     icon: Icons.attach_money,
                   ),
+                  SizedBox(height: 20.sp), // Add spacing
                   CustomTextFormField(
                     controller: _discountController,
                     labelText: 'Discount',
                     icon: Icons.discount,
                   ),
+                  SizedBox(height: 20.sp), // Add spacing
                   CustomTextFormField(
                     controller: _discountForController,
                     labelText: 'Discount For',
                     icon: Icons.group,
                   ),
+                  SizedBox(height: 20.sp), // Add spacing
                   SwitchListTile(
                     title: const Text('Is Bus Available?'),
                     value: _isBusAvailable,
@@ -518,30 +551,41 @@ class _EditEventPageState extends State<EditEventPage> {
                     },
                   ),
                   if (_isBusAvailable) ...[
+                    SizedBox(height: 20.sp), // Add spacing
                     CustomTextFormField(
                       controller: TextEditingController(
                         text: _numberOfBuses?.toString() ?? '',
                       ),
                       labelText: 'Number of Buses',
                       icon: Icons.directions_bus,
-                      validator:
-                          (value) =>
-                              value == null || value.isEmpty
-                                  ? 'Enter number of buses'
-                                  : null,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Enter number of buses';
+                        }
+                        setState(() {
+                          _numberOfBuses = int.tryParse(value) ?? 0;
+                        });
+                        return null;
+                      },
                     ),
+                    SizedBox(height: 20.sp), // Add spacing
                     CustomTextFormField(
                       controller: TextEditingController(
                         text: _seatsPerBus?.toString() ?? '',
                       ),
                       labelText: 'Seats Per Bus',
                       icon: Icons.event_seat,
-                      validator:
-                          (value) =>
-                              value == null || value.isEmpty
-                                  ? 'Enter seats per bus'
-                                  : null,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Enter seats per bus';
+                        }
+                        setState(() {
+                          _seatsPerBus = int.tryParse(value) ?? 0;
+                        });
+                        return null;
+                      },
                     ),
+                    SizedBox(height: 20.sp), // Add spacing
                     CustomTextFormField(
                       controller: _busTicketPriceController,
                       labelText: 'Bus Ticket Price',
@@ -552,6 +596,7 @@ class _EditEventPageState extends State<EditEventPage> {
                                   ? 'Enter bus ticket price'
                                   : null,
                     ),
+                    SizedBox(height: 20.sp), // Add spacing
                     CustomTextFormField(
                       controller: _busSourceController,
                       labelText: 'Bus Source',
@@ -562,6 +607,7 @@ class _EditEventPageState extends State<EditEventPage> {
                                   ? 'Enter bus source'
                                   : null,
                     ),
+                    SizedBox(height: 20.sp), // Add spacing
                     CustomTextFormField(
                       controller: _busDestinationController,
                       labelText: 'Bus Destination',
@@ -572,6 +618,7 @@ class _EditEventPageState extends State<EditEventPage> {
                                   ? 'Enter bus destination'
                                   : null,
                     ),
+                    SizedBox(height: 20.sp), // Add spacing
                     CustomTextFormField(
                       controller: _busDepartureTimeController,
                       labelText: 'Bus Departure Time',
@@ -582,6 +629,7 @@ class _EditEventPageState extends State<EditEventPage> {
                                   ? 'Enter departure time'
                                   : null,
                     ),
+                    SizedBox(height: 20.sp), // Add spacing
                     CustomTextFormField(
                       controller: _busArrivalTimeController,
                       labelText: 'Bus Arrival Time',
@@ -592,6 +640,7 @@ class _EditEventPageState extends State<EditEventPage> {
                                   ? 'Enter arrival time'
                                   : null,
                     ),
+                    SizedBox(height: 20.sp), // Add spacing
                     CustomTextFormField(
                       controller: _tripExplanationController,
                       labelText: 'Program Details',
@@ -605,16 +654,19 @@ class _EditEventPageState extends State<EditEventPage> {
                   ],
                 ],
               ],
+              SizedBox(height: 20.sp), // Add spacing
               CustomTextFormField(
                 controller: _contactNumberController,
                 labelText: 'Contact Number',
                 icon: Icons.phone,
               ),
+              SizedBox(height: 20.sp), // Add spacing
               CustomTextFormField(
                 controller: _contactEmailController,
                 labelText: 'Contact Email',
                 icon: Icons.email,
               ),
+              SizedBox(height: 30.sp), // Add spacing
               CustomElevatedButton(
                 label: 'Update Event',
                 onPressed: _updateEvent,

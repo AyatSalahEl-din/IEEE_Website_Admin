@@ -39,6 +39,11 @@ class AddEventForm extends StatefulWidget {
   final bool isSeatBookingAvailable;
   final TextEditingController busDepartureTimeController;
   final TextEditingController busArrivalTimeController;
+  final TextEditingController appNameController; // Added
+  final TextEditingController appTimeController; // Added
+  final TextEditingController appUrlController; // Added
+  final bool isOnlineEvent; // Added
+  final String? selectedApp; // Added
 
   const AddEventForm({
     super.key,
@@ -75,6 +80,11 @@ class AddEventForm extends StatefulWidget {
     required this.isSeatBookingAvailable,
     required this.busDepartureTimeController,
     required this.busArrivalTimeController,
+    required this.appNameController, // Added
+    required this.appTimeController, // Added
+    required this.appUrlController, // Added
+    required this.isOnlineEvent, // Added
+    required this.selectedApp, // Added
   });
 
   @override
@@ -281,6 +291,10 @@ class _AddEventFormState extends State<AddEventForm> {
               onChanged: (value) {
                 setState(() {
                   selectedApp = value;
+                  if (value != 'Other') {
+                    appNameController
+                        .clear(); // Clear custom app name if not "Other"
+                  }
                 });
               },
               decoration: InputDecoration(
@@ -289,6 +303,11 @@ class _AddEventFormState extends State<AddEventForm> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
+              validator:
+                  (value) =>
+                      value == null || value.isEmpty
+                          ? 'Select an app hosting option'
+                          : null,
             ),
             if (selectedApp == 'Other') ...[
               SizedBox(height: 30.sp),
@@ -497,10 +516,20 @@ class _AddEventFormState extends State<AddEventForm> {
             constraints: BoxConstraints.tightFor(width: 200.sp),
             child: ElevatedButton(
               onPressed: () async {
+                if (!widget.formKey.currentState!.validate()) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please fill all required fields.'),
+                    ),
+                  );
+                  return;
+                }
+
                 print("Add Event button pressed");
                 print(
                   "Form Data: ${widget.nameController.text}, ${widget.categoryController.text}",
                 );
+
                 await widget.addEvent(
                   context: context,
                   formKey: widget.formKey,
@@ -534,6 +563,11 @@ class _AddEventFormState extends State<AddEventForm> {
                   isSeatBookingAvailable: isSeatBookingAvailable,
                   busDepartureTimeController: widget.busDepartureTimeController,
                   busArrivalTimeController: widget.busArrivalTimeController,
+                  isOnlineEvent: isOnlineEvent,
+                  appTimeController: appTimeController,
+                  appUrlController: appUrlController,
+                  appNameController: appNameController,
+                  selectedApp: selectedApp,
                 );
               },
               child:

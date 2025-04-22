@@ -168,7 +168,7 @@ class _AdminEventPageState extends State<AdminEventPage> {
                   setLoading: _setLoading,
                   resetForm: _resetForm,
                   pickDate: _pickDate,
-                  addEvent: addEvent, // Ensure addEvent is correctly imported
+                  addEvent: addEvent, // Ensure addEvent is correctly passed
                   ticketPriceController: TextEditingController(),
                   discountController: TextEditingController(),
                   discountForController: TextEditingController(),
@@ -187,6 +187,11 @@ class _AdminEventPageState extends State<AdminEventPage> {
                   isSeatBookingAvailable: false,
                   busDepartureTimeController: TextEditingController(),
                   busArrivalTimeController: TextEditingController(),
+                  appNameController: TextEditingController(), // Added
+                  appTimeController: TextEditingController(), // Added
+                  appUrlController: TextEditingController(), // Added
+                  isOnlineEvent: false, // Added
+                  selectedApp: null, // Added
                 ),
               if (_selectedIndex == 1) EditEventWidget(),
               if (_selectedIndex == 2) BuildDeleteEventWidget(),
