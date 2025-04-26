@@ -13,7 +13,7 @@ import 'package:ieee_website/Events/proposals.dart'; // Import the proposals wid
 
 class AdminEventPage extends StatefulWidget {
   static const String routeName = 'admin';
-  final TabController? tabController; // ✅ Make TabController optional
+  final TabController? tabController;
 
   AdminEventPage({super.key, this.tabController});
 
@@ -103,7 +103,7 @@ class _AdminEventPageState extends State<AdminEventPage> {
         .delete();
   }*/
 
-  @override
+ @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -115,13 +115,14 @@ class _AdminEventPageState extends State<AdminEventPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Tab buttons to switch between Add, Edit, Delete, Manage Requests, and Proposals
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Button Row - Wrap with SingleChildScrollView for horizontal scrolling if needed
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   CustomElevatedButton(
                     label: 'Add Event',
@@ -149,13 +150,19 @@ class _AdminEventPageState extends State<AdminEventPage> {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+            ),
+            const SizedBox(height: 20),
 
-              // Show content based on the selected tab
-              if (_selectedIndex == 0)
-                AddEventForm(
-                  formKey: _formKey,
-                  nameController: _nameController,
+            // Main Content Area - Use Expanded to ensure proper sizing
+            Expanded(
+              child: IndexedStack(
+                index: _selectedIndex,
+                children: [
+                  // Index 0: Add Event
+                  SingleChildScrollView(
+                    child: AddEventForm(
+                      formKey: _formKey,
+                      nameController: _nameController,
                   categoryController: _categoryController,
                   descriptionController: _descriptionController,
                   locationController: _locationController,
@@ -168,7 +175,7 @@ class _AdminEventPageState extends State<AdminEventPage> {
                   setLoading: _setLoading,
                   resetForm: _resetForm,
                   pickDate: _pickDate,
-                  addEvent: addEvent, // Ensure addEvent is correctly passed
+                  addEvent: addEvent, 
                   ticketPriceController: TextEditingController(),
                   discountController: TextEditingController(),
                   discountForController: TextEditingController(),
@@ -192,15 +199,25 @@ class _AdminEventPageState extends State<AdminEventPage> {
                   appUrlController: TextEditingController(), // Added
                   isOnlineEvent: false, // Added
                   selectedApp: null, // Added
-                ),
-              if (_selectedIndex == 1) EditEventWidget(),
-              if (_selectedIndex == 2) BuildDeleteEventWidget(),
-              if (_selectedIndex == 3)
-                const BuildManageReq(), // Ensure this widget is properly initialized
-              if (_selectedIndex == 4)
-                const ProposalsWidget(), // Ensure this widget is properly initialized
-            ],
-          ),
+                ),),
+                  EditEventWidget(),
+                  
+                  // Index 2: Delete Event
+                  BuildDeleteEventWidget(),
+                  
+                  // Index 3: Manage Requests - Key fix is here
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      return ManageRequestsWidget();
+                    },
+                  ),
+                  
+                  // Index 4: Proposals
+                  ProposalsWidget(),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

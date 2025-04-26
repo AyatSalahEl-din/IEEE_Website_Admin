@@ -5,6 +5,7 @@ import '../../Themes/website_colors.dart';
 import 'Date_picker_tile.dart';
 import 'custom_text_form_field.dart';
 
+// ignore: must_be_immutable
 class AddEventForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
   final TextEditingController nameController;
@@ -33,9 +34,9 @@ class AddEventForm extends StatefulWidget {
   final TextEditingController contactEmailController;
   final bool isTicketAvailable;
   final bool isTicketLimited;
-  final int? ticketLimit;
-  final int? numberOfBuses;
-  final int? seatsPerBus;
+  int? ticketLimit;
+  int? numberOfBuses;
+  int? seatsPerBus;
   final bool isSeatBookingAvailable;
   final TextEditingController busDepartureTimeController;
   final TextEditingController busArrivalTimeController;
@@ -45,7 +46,7 @@ class AddEventForm extends StatefulWidget {
   final bool isOnlineEvent; // Added
   final String? selectedApp; // Added
 
-  const AddEventForm({
+  AddEventForm({
     super.key,
     required this.formKey,
     required this.nameController,
@@ -131,6 +132,8 @@ class _AddEventFormState extends State<AddEventForm> {
             controller: widget.nameController,
             labelText: 'Event Name',
             icon: Icons.event,
+            keyboardType: TextInputType.text, // Add required keyboardType
+            onChanged: (value) {}, // Add required onChanged
             validator:
                 (value) =>
                     value == null || value.isEmpty ? 'Enter event name' : null,
@@ -140,6 +143,8 @@ class _AddEventFormState extends State<AddEventForm> {
             controller: widget.categoryController,
             labelText: 'Category',
             icon: Icons.category_outlined,
+            keyboardType: TextInputType.text, // Add required keyboardType
+            onChanged: (value) {}, // Add required onChanged
             validator:
                 (value) =>
                     value == null || value.isEmpty ? 'Enter category' : null,
@@ -150,6 +155,8 @@ class _AddEventFormState extends State<AddEventForm> {
             labelText: 'Description',
             icon: Icons.description,
             isMultiline: true,
+            keyboardType: TextInputType.multiline, // Add required keyboardType
+            onChanged: (value) {}, // Add required onChanged
             validator:
                 (value) =>
                     value == null || value.isEmpty ? 'Enter description' : null,
@@ -159,6 +166,8 @@ class _AddEventFormState extends State<AddEventForm> {
             controller: widget.imageUrlController,
             labelText: 'Image URL',
             icon: Icons.image,
+            keyboardType: TextInputType.url, // Add required keyboardType
+            onChanged: (value) {}, // Add required onChanged
           ),
           SizedBox(height: 60.sp),
           ElevatedButton.icon(
@@ -231,12 +240,16 @@ class _AddEventFormState extends State<AddEventForm> {
             controller: widget.locationController,
             labelText: 'Location',
             icon: Icons.location_on,
+            keyboardType: TextInputType.text, // Add required keyboardType
+            onChanged: (value) {}, // Add required onChanged
           ),
           SizedBox(height: 30.sp),
           CustomTextFormField(
             controller: widget.timeController,
             labelText: 'Time (e.g. 3:00 PM)',
             icon: Icons.access_time,
+            keyboardType: TextInputType.datetime, // Add required keyboardType
+            onChanged: (value) {}, // Add required onChanged
           ),
           SizedBox(height: 30.sp),
           CustomDatePicker(
@@ -267,6 +280,8 @@ class _AddEventFormState extends State<AddEventForm> {
               controller: appTimeController,
               labelText: 'Exact Time (e.g., 3:00 PM)',
               icon: Icons.access_time,
+              keyboardType: TextInputType.datetime, // Add required keyboardType
+              onChanged: (value) {}, // Add required onChanged
               validator:
                   (value) =>
                       value == null || value.isEmpty
@@ -278,6 +293,8 @@ class _AddEventFormState extends State<AddEventForm> {
               controller: appUrlController,
               labelText: 'Pre-URL (Optional)',
               icon: Icons.link,
+              keyboardType: TextInputType.url, // Add required keyboardType
+              onChanged: (value) {}, // Add required onChanged
             ),
             SizedBox(height: 30.sp),
             DropdownButtonFormField<String>(
@@ -315,6 +332,8 @@ class _AddEventFormState extends State<AddEventForm> {
                 controller: appNameController,
                 labelText: 'App Name',
                 icon: Icons.apps,
+                keyboardType: TextInputType.text, // Add required keyboardType
+                onChanged: (value) {}, // Add required onChanged
                 validator:
                     (value) =>
                         value == null || value.isEmpty
@@ -347,6 +366,7 @@ class _AddEventFormState extends State<AddEventForm> {
                   onChanged: (value) {
                     setState(() {
                       isTicketLimited = value;
+                      // Ensure ticket limits are not reset when toggling bus availability
                     });
                   },
                 ),
@@ -357,17 +377,27 @@ class _AddEventFormState extends State<AddEventForm> {
                     ),
                     labelText: 'Ticket Limit',
                     icon: Icons.confirmation_number,
-                    validator:
-                        (value) =>
-                            value == null || value.isEmpty
-                                ? 'Enter ticket limit'
-                                : null,
+                    keyboardType:
+                        TextInputType.number, // Add required keyboardType
+                    onChanged: (value) {
+                      widget.ticketLimit =
+                          int.tryParse(value) ?? 0; // Save ticket limit
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Enter ticket limit';
+                      }
+                      return null;
+                    },
                   ),
                 SizedBox(height: 30.sp),
                 CustomTextFormField(
                   controller: widget.ticketPriceController,
                   labelText: 'Ticket Price',
                   icon: Icons.attach_money,
+                  keyboardType:
+                      TextInputType.number, // Add required keyboardType
+                  onChanged: (value) {}, // Add required onChanged
                   validator:
                       (value) =>
                           value == null || value.isEmpty
@@ -377,14 +407,24 @@ class _AddEventFormState extends State<AddEventForm> {
                 SizedBox(height: 30.sp),
                 CustomTextFormField(
                   controller: widget.discountController,
-                  labelText: 'Discount',
+                  labelText: 'Discount (%)',
                   icon: Icons.discount,
+                  keyboardType: TextInputType.number,
+                  onChanged: (value) {}, // Add required onChanged
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Enter discount percentage';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(height: 30.sp),
                 CustomTextFormField(
                   controller: widget.discountForController,
                   labelText: 'Discount For (e.g., Students)',
                   icon: Icons.group,
+                  keyboardType: TextInputType.text, // Add required keyboardType
+                  onChanged: (value) {}, // Add required onChanged
                 ),
                 SizedBox(height: 30.sp),
                 SwitchListTile(
@@ -393,37 +433,59 @@ class _AddEventFormState extends State<AddEventForm> {
                   onChanged: (value) {
                     setState(() {
                       isBusAvailable = value;
+                      // Ensure ticket limits are not affected when toggling bus availability
                     });
                   },
                 ),
                 if (isBusAvailable) ...[
                   SizedBox(height: 30.sp),
                   CustomTextFormField(
-                    controller: TextEditingController(),
+                    controller: TextEditingController(
+                      text: widget.numberOfBuses?.toString() ?? '',
+                    ),
                     labelText: 'Number of Buses',
                     icon: Icons.directions_bus,
-                    validator:
-                        (value) =>
-                            value == null || value.isEmpty
-                                ? 'Enter number of buses'
-                                : null,
+                    keyboardType:
+                        TextInputType.number, // Add required keyboardType
+                    onChanged: (value) {}, // Add required onChanged
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Enter number of buses';
+                      }
+                      widget.numberOfBuses =
+                          int.tryParse(value) ??
+                          0; // Ensure number of buses is saved
+                      return null;
+                    },
                   ),
                   SizedBox(height: 30.sp),
                   CustomTextFormField(
-                    controller: TextEditingController(),
+                    controller: TextEditingController(
+                      text: widget.seatsPerBus?.toString() ?? '',
+                    ),
                     labelText: 'Seats Per Bus',
                     icon: Icons.event_seat,
-                    validator:
-                        (value) =>
-                            value == null || value.isEmpty
-                                ? 'Enter seats per bus'
-                                : null,
+                    keyboardType:
+                        TextInputType.number, // Add required keyboardType
+                    onChanged: (value) {}, // Add required onChanged
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Enter seats per bus';
+                      }
+                      widget.seatsPerBus =
+                          int.tryParse(value) ??
+                          0; // Ensure seats per bus is saved
+                      return null;
+                    },
                   ),
                   SizedBox(height: 30.sp),
                   CustomTextFormField(
                     controller: widget.busTicketPriceController,
                     labelText: 'Bus Ticket Price Per Seat',
                     icon: Icons.directions_bus,
+                    keyboardType:
+                        TextInputType.number, // Add required keyboardType
+                    onChanged: (value) {}, // Add required onChanged
                     validator:
                         (value) =>
                             value == null || value.isEmpty
@@ -435,6 +497,9 @@ class _AddEventFormState extends State<AddEventForm> {
                     controller: widget.busSourceController,
                     labelText: 'Bus Departure Location',
                     icon: Icons.location_on,
+                    keyboardType:
+                        TextInputType.text, // Add required keyboardType
+                    onChanged: (value) {}, // Add required onChanged
                     validator:
                         (value) =>
                             value == null || value.isEmpty
@@ -446,6 +511,9 @@ class _AddEventFormState extends State<AddEventForm> {
                     controller: widget.busDestinationController,
                     labelText: 'Bus Destination',
                     icon: Icons.location_on,
+                    keyboardType:
+                        TextInputType.text, // Add required keyboardType
+                    onChanged: (value) {}, // Add required onChanged
                     validator:
                         (value) =>
                             value == null || value.isEmpty
@@ -457,6 +525,9 @@ class _AddEventFormState extends State<AddEventForm> {
                     controller: widget.busDepartureTimeController,
                     labelText: 'Bus Departure Time',
                     icon: Icons.access_time,
+                    keyboardType:
+                        TextInputType.datetime, // Add required keyboardType
+                    onChanged: (value) {}, // Add required onChanged
                     validator:
                         (value) =>
                             value == null || value.isEmpty
@@ -468,6 +539,9 @@ class _AddEventFormState extends State<AddEventForm> {
                     controller: widget.busArrivalTimeController,
                     labelText: 'Bus Arrival Time',
                     icon: Icons.access_time,
+                    keyboardType:
+                        TextInputType.datetime, // Add required keyboardType
+                    onChanged: (value) {}, // Add required onChanged
                     validator:
                         (value) =>
                             value == null || value.isEmpty
@@ -479,6 +553,9 @@ class _AddEventFormState extends State<AddEventForm> {
                     controller: widget.tripExplanationController,
                     labelText: 'Program Details',
                     icon: Icons.info,
+                    keyboardType:
+                        TextInputType.text, // Add required keyboardType
+                    onChanged: (value) {}, // Add required onChanged
                     validator:
                         (value) =>
                             value == null || value.isEmpty
@@ -494,6 +571,8 @@ class _AddEventFormState extends State<AddEventForm> {
             controller: widget.contactNumberController,
             labelText: 'Contact Number',
             icon: Icons.phone,
+            keyboardType: TextInputType.phone, // Add required keyboardType
+            onChanged: (value) {}, // Add required onChanged
             validator:
                 (value) =>
                     value == null || value.isEmpty
@@ -505,6 +584,9 @@ class _AddEventFormState extends State<AddEventForm> {
             controller: widget.contactEmailController,
             labelText: 'Contact Email',
             icon: Icons.email,
+            keyboardType:
+                TextInputType.emailAddress, // Add required keyboardType
+            onChanged: (value) {}, // Add required onChanged
             validator:
                 (value) =>
                     value == null || value.isEmpty

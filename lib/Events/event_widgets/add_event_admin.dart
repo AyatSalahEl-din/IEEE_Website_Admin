@@ -71,33 +71,34 @@ void addEvent({
       if (!isOnlineEvent) ...{
         'ticketPrice':
             double.tryParse(ticketPriceController.text.trim()) ?? 0.0,
-        'discount': double.tryParse(discountController.text.trim()) ?? 0.0,
+        'discount':
+            double.tryParse(discountController.text.trim()) ??
+            0.0, // Ensure discount is in percentage
         'discountFor': discountForController.text.trim(),
         'isTicketAvailable': isTicketAvailable,
         'isTicketLimited': isTicketLimited,
-        'ticketLimit': isTicketLimited ? ticketLimit : null,
-        'busDetails':
-            isBusAvailable
-                ? {
-                  'numberOfBuses': numberOfBuses ?? 0,
-                  'seatsPerBus': seatsPerBus ?? 0,
-                  'isSeatBookingAvailable': isSeatBookingAvailable,
-                  'ticketPrice':
-                      double.tryParse(busTicketPriceController.text.trim()) ??
-                      0.0,
-                  'seats': int.tryParse(busSeatsController.text.trim()) ?? 0,
-                  'source': busSourceController.text.trim(),
-                  'destination': busDestinationController.text.trim(),
-                  'tripExplanation': tripExplanationController.text.trim(),
-                  'departureTime': busDepartureTimeController.text.trim(),
-                  'arrivalTime': busArrivalTimeController.text.trim(),
-                }
-                : null,
-        'contact': {
-          'number': contactNumberController.text.trim(),
-          'email': contactEmailController.text.trim(),
+        if (isTicketLimited && ticketLimit != null) 'ticketLimit': ticketLimit,
+        if (isBusAvailable) ...{
+          'busDetails': {
+            if (numberOfBuses != null) 'numberOfBuses': numberOfBuses,
+            if (seatsPerBus != null) 'seatsPerBus': seatsPerBus,
+            'isSeatBookingAvailable': isSeatBookingAvailable,
+            'ticketPrice':
+                double.tryParse(busTicketPriceController.text.trim()) ?? 0.0,
+            'seats': int.tryParse(busSeatsController.text.trim()) ?? 0,
+            'source': busSourceController.text.trim(),
+            'destination': busDestinationController.text.trim(),
+            'tripExplanation': tripExplanationController.text.trim(),
+            'departureTime': busDepartureTimeController.text.trim(),
+            'arrivalTime': busArrivalTimeController.text.trim(),
+          },
         },
       },
+      'contact': {
+        'number': contactNumberController.text.trim(),
+        'email': contactEmailController.text.trim(),
+      },
+      'createdAt': FieldValue.serverTimestamp(),
     };
 
     await FirebaseFirestore.instance.collection('events').add(eventData);

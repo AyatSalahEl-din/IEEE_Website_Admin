@@ -2,355 +2,613 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ieee_website/Themes/website_colors.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class BuildManageReq extends StatefulWidget {
-  const BuildManageReq({super.key});
+class ManageRequestsWidget extends StatefulWidget {
+  const ManageRequestsWidget({Key? key}) : super(key: key);
 
   @override
-  State<BuildManageReq> createState() => _BuildManageReqState();
+  State<ManageRequestsWidget> createState() => _ManageRequestsWidgetState();
 }
 
-class _BuildManageReqState extends State<BuildManageReq> {
-  final String paymentNumber =
-      "1234567890"; // Replace with the actual payment number
+class _ManageRequestsWidgetState extends State<ManageRequestsWidget> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  String _selectedStatus = 'All';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(16.sp),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Manage Requests',
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              color: WebsiteColors.primaryBlueColor,
-              fontSize: 30.sp,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 20.sp),
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream:
-                  FirebaseFirestore.instance.collection('requests').snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (snapshot.hasError) {
-                  return const Center(
-                    child: Text("An error occurred while loading requests."),
-                  );
-                }
-
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return const Center(child: Text("No requests found."));
-                }
-
-                final requests = snapshot.data!.docs;
-
-                return ListView.builder(
-                  itemCount: requests.length,
-                  itemBuilder: (context, index) {
-                    final request = requests[index];
-                    final data = request.data() as Map<String, dynamic>;
-
-                    final userName = data['userName'] ?? 'No Name';
-                    //final userPhone = data['userPhone'] ?? 'No Phone';
-                    //final userEmail = data['userEmail'] ?? 'No Email';
-                    final eventName = data['eventName'] ?? 'No Event';
-                    final requestDate =
-                        (data['requestDate'] as Timestamp).toDate();
-
-                    return Card(
-                      margin: EdgeInsets.symmetric(vertical: 10.sp),
-                      elevation: 5,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.sp),
-                      ),
-                      child: ListTile(
-                        title: Text(
-                          userName,
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodyLarge?.copyWith(
-                            fontSize: 22.sp,
-                            fontWeight: FontWeight.bold,
-                            color: WebsiteColors.primaryBlueColor,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Container(
+          child: Column(
+            children: [
+              // Search and Filter Row
+              Padding(
+                padding: EdgeInsets.all(16.sp),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          hintText: 'Search requests...',
+                          hintStyle: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: WebsiteColors.greyColor),
+                          prefixIcon: Icon(Icons.search, size: 30.sp),
+                          filled: true,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.sp),
+                            borderSide: BorderSide.none,
                           ),
                         ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Event: $eventName',
-                              style: Theme.of(
-                                context,
-                              ).textTheme.bodyMedium?.copyWith(
-                                fontSize: 18.sp,
-                                color: WebsiteColors.darkBlueColor,
-                              ),
+                        onChanged:
+                            (value) => setState(
+                              () => _searchQuery = value.toLowerCase(),
                             ),
-                            Text(
-                              'Date: ${requestDate.toLocal()}',
-                              style: Theme.of(
-                                context,
-                              ).textTheme.bodyMedium?.copyWith(
-                                fontSize: 18.sp,
-                                color: WebsiteColors.greyColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                        trailing: IconButton(
-                          icon: Icon(
-                            Icons.info,
-                            color: WebsiteColors.primaryBlueColor,
-                          ),
-                          onPressed:
-                              () => _showRequestDetails(
-                                context,
-                                data,
-                                request.id,
-                              ),
-                        ),
                       ),
-                    );
-                  },
-                );
-              },
-            ),
+                    ),
+                    SizedBox(width: 10.sp),
+                    DropdownButton<String>(
+                      value: _selectedStatus,
+                      dropdownColor: Colors.white, // White dropdown background
+                      style: TextStyle(
+                        fontSize: 25.sp,
+                        color: WebsiteColors.darkBlueColor,
+                      ),
+                      items: [
+                        DropdownMenuItem(
+                          value: 'All',
+                          child: Text('All', style: TextStyle(fontSize: 25.sp)),
+                        ),
+                        DropdownMenuItem(
+                          value: 'pending',
+                          child: Text(
+                            'Pending',
+                            style: TextStyle(fontSize: 25.sp),
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: 'approved',
+                          child: Text(
+                            'Approved',
+                            style: TextStyle(fontSize: 25.sp),
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: 'rejected',
+                          child: Text(
+                            'Rejected',
+                            style: TextStyle(fontSize: 25.sp),
+                          ),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedStatus = value!;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              // Main Content Area
+              Expanded(
+                child: Container(
+                  child: _buildRequestList(constraints),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  /// Show Request Details in a Dialog
-  void _showRequestDetails(
+  Widget _buildRequestList(BoxConstraints constraints) {
+    return StreamBuilder<QuerySnapshot>(
+      stream:
+          FirebaseFirestore.instance
+              .collection('requests')
+              .orderBy('requestDate', descending: true)
+              .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(
+              color: WebsiteColors.primaryBlueColor,
+            ),
+          );
+        }
+
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(
+            child: Text(
+              "No requests found.",
+              style: TextStyle(fontSize: 30.sp),
+            ),
+          );
+        }
+
+        final filteredRequests =
+            snapshot.data!.docs.where((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              final matchesSearch =
+                  _searchQuery.isEmpty ||
+                  (data['userName'] ?? '').toString().toLowerCase().contains(
+                    _searchQuery,
+                  ) ||
+                  (data['eventName'] ?? '').toString().toLowerCase().contains(
+                    _searchQuery,
+                  );
+
+              final matchesStatus =
+                  _selectedStatus == 'All' ||
+                  (data['status'] ?? 'pending') == _selectedStatus;
+
+              return matchesSearch && matchesStatus;
+            }).toList();
+
+        if (filteredRequests.isEmpty) {
+          return Center(
+            child: Text(
+              "No matching requests found.",
+              style: TextStyle(fontSize: 30.sp),
+            ),
+          );
+        }
+
+        final crossAxisCount = (constraints.maxWidth / 200).floor().clamp(1, 5);
+
+        return GridView.builder(
+          padding: EdgeInsets.all(8.sp),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 8.sp,
+            mainAxisSpacing: 8.sp,
+            childAspectRatio: 1, // Square cards
+          ),
+          itemCount: filteredRequests.length,
+          itemBuilder: (context, index) {
+            final request = filteredRequests[index];
+            final data = request.data() as Map<String, dynamic>;
+            return buildCard(context, data, request.id);
+          },
+        );
+      },
+    );
+  }
+
+  Widget buildCard(
     BuildContext context,
     Map<String, dynamic> data,
     String requestId,
   ) {
-    final userName = data['userName'] ?? 'No Name';
-    final userPhone = data['userPhone'] ?? 'No Phone';
-    final userEmail = data['userEmail'] ?? 'No Email';
-    final eventName = data['eventName'] ?? 'No Event';
-    final requestDate = (data['requestDate'] as Timestamp).toDate();
+    final requestDate =
+        data['requestDate'] is Timestamp
+            ? (data['requestDate'] as Timestamp).toDate()
+            : DateTime.now();
 
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text(
-              'Request Details',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                color: WebsiteColors.primaryBlueColor,
-              ),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return Card(
+      color: Colors.white, // White background for the card
+      elevation: 2,
+      margin: EdgeInsets.all(4.sp),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
+      child: Padding(
+        padding: EdgeInsets.all(10.sp),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Top row with delete button and status
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Name: $userName'),
-                SizedBox(height: 10.sp),
-                GestureDetector(
-                  onTap: () => _launchWhatsApp(userPhone),
+                // Delete button
+                IconButton(
+                  icon: Icon(Icons.delete, size: 18.sp),
+                  color: Colors.red,
+                  padding: EdgeInsets.zero,
+                  constraints: BoxConstraints(),
+                  onPressed: () => _confirmDeletion(context, requestId),
+                ),
+                // Status badge
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 8.sp,
+                    vertical: 2.sp,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _getStatusColor(data['status']),
+                    borderRadius: BorderRadius.circular(8.sp),
+                  ),
                   child: Text(
-                    'Phone: $userPhone',
+                    (data['status'] ?? 'pending').toString().toUpperCase(),
                     style: TextStyle(
-                      color: Colors.green,
-                      decoration: TextDecoration.underline,
+                      fontSize: 12.sp,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-                SizedBox(height: 10.sp),
-                GestureDetector(
-                  onTap: () => _launchEmail(userEmail),
-                  child: Text(
-                    'Email: $userEmail',
-                    style: TextStyle(
-                      color: Colors.blue,
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10.sp),
-                Text('Event: $eventName'),
-                SizedBox(height: 10.sp),
-                Text('Date: ${requestDate.toLocal()}'),
               ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Close'),
+            SizedBox(height: 6.sp),
+
+            // Event name
+            Text(
+              data['eventName'] ?? 'No Event',
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.bold,
+                color: WebsiteColors.primaryBlueColor,
               ),
-              ElevatedButton(
-                onPressed:
-                    () => _acceptRequest(
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            SizedBox(height: 8.sp),
+
+            // User details
+            _buildDetailRow(
+              Icons.person_outline,
+              data['userName'] ?? 'No Name',
+            ),
+            _buildDetailRow(
+              Icons.phone_iphone,
+              data['userPhone'] ?? 'No Phone',
+              isPhone: true,
+              phoneData: data,
+            ),
+            _buildDetailRow(
+              Icons.email_outlined,
+              data['userEmail'] ?? 'No Email',
+            ),
+            SizedBox(height: 8.sp),
+
+            // Event details
+            _buildDetailRow(
+              Icons.calendar_month,
+              DateFormat('MM/dd/yy').format(requestDate),
+            ),
+            _buildDetailRow(
+              Icons.confirmation_num_outlined,
+              '${data['numberOfTickets'] ?? 1} ticket(s)',
+            ),
+            if (data['busRequired'] == true)
+              _buildDetailRow(
+                Icons.directions_bus,
+                '${data['numberOfBusTickets'] ?? 0} bus seat(s)',
+              ),
+            _buildDetailRow(
+              Icons.payments_outlined,
+              'Total: \$${(data['totalPrice'] ?? 0).toStringAsFixed(2)}',
+              isBold: true,
+            ),
+            Spacer(),
+
+            // Action buttons
+            Row(
+              children: [
+                Expanded(
+                  child: _buildActionButton(
+                    'PAID',
+                    Colors.green,
+                    () => _confirmStatusChange(
                       context,
                       requestId,
-                      userEmail,
-                      userPhone,
-                      eventName,
+                      'paid',
+                      data,
+                      'Mark as Paid',
+                      'Confirm payment for this request?',
                     ),
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                child: const Text('Accept Request'),
-              ),
-              ElevatedButton(
-                onPressed:
-                    () =>
-                        _denyRequest(context, requestId, userEmail, userPhone),
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                child: const Text('Deny Request'),
-              ),
-            ],
-          ),
+                  ),
+                ),
+                SizedBox(width: 4.sp),
+                Expanded(
+                  child: _buildActionButton(
+                    'UNPAID',
+                    Colors.orange,
+                    () => _confirmStatusChange(
+                      context,
+                      requestId,
+                      'unpaid',
+                      data,
+                      'Mark as Unpaid',
+                      'Mark this request as unpaid?',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  /// Accept Request and Notify User
-  Future<void> _acceptRequest(
-    BuildContext context,
-    String requestId,
-    String userEmail,
-    String userPhone,
-    String eventName,
-  ) async {
-    // Update Firestore
-    await FirebaseFirestore.instance
-        .collection('requests')
-        .doc(requestId)
-        .update({'status': 'accepted'});
+  Widget _buildDetailRow(
+    IconData icon,
+    String text, {
+    bool isPhone = false,
+    bool isBold = false,
+    Map<String, dynamic>? phoneData,
+  }) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 2.sp),
+      child: InkWell(
+        onTap: isPhone ? () => _launchPhoneConfirmation(phoneData!) : null,
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 16.sp,
+              color: isPhone ? Colors.green : WebsiteColors.primaryBlueColor,
+            ),
+            SizedBox(width: 4.sp),
+            Expanded(
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  color: isPhone ? Colors.blue : WebsiteColors.darkBlueColor,
+                  fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+                  decoration: isPhone ? TextDecoration.underline : null,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-    // Notify User via Email and WhatsApp
+  Widget _buildActionButton(String text, Color color, VoidCallback onPressed) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4.sp),
+        ),
+        padding: EdgeInsets.symmetric(vertical: 4.sp),
+        minimumSize: Size(0, 28.sp),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 12.sp,
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _launchPhoneConfirmation(Map<String, dynamic> data) async {
+    final phoneNumber = data['userPhone'];
+    if (phoneNumber == null || phoneNumber.isEmpty) return;
+
+    final eventName = data['eventName'] ?? 'the event';
+    final tickets = data['numberOfTickets'] ?? 1;
+    final price = (data['totalPrice'] ?? 0).toStringAsFixed(2);
+    final busSeats =
+        data['busRequired'] == true ? data['numberOfBusTickets'] ?? 0 : 0;
+
     final message = '''
-Your request for the event "$eventName" has been accepted. 
-Please transfer the ticket payment to the following number:
+Hello ${data['userName'] ?? 'there'},
 
-Payment Number: $paymentNumber
+I'm contacting you from IEEE PUA SB to confirm your booking for *$eventName*:
 
-Once the payment is completed, please send a confirmation message to this number.
+- Tickets: $tickets
+${busSeats > 0 ? '- Bus seats: $busSeats\n' : ''}
+- Total: \$$price
 
-Thank you!
+Please confirm if you're still interested in attending.
+
+Best regards,
+IEEE PUA SB
 ''';
 
-    _launchEmail(
-      userEmail,
-      subject: 'Request Accepted - Payment Details',
-      body: message,
-    );
-    _launchWhatsApp(userPhone, message: message);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Request accepted and user notified.')),
-    );
+    await _launchWhatsApp(phoneNumber, message);
   }
 
-  /// Deny Request with Reason
-  Future<void> _denyRequest(
-    BuildContext context,
-    String requestId,
-    String userEmail,
-    String userPhone,
-  ) async {
-    TextEditingController reasonController = TextEditingController();
+  Future<void> _confirmStatusChange(
+  BuildContext context,
+  String requestId,
+  String newStatus,
+  Map<String, dynamic> data,
+  String dialogTitle,
+  String dialogContent,
+) async {
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      backgroundColor: Colors.white,
+      title: Text(dialogTitle),
+      content: Text(dialogContent),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(
+            'CANCEL',
+            style: TextStyle(color: WebsiteColors.darkBlueColor),
+          ),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: newStatus == 'paid' ? Colors.green : Colors.orange,
+          ),
+          onPressed: () => Navigator.of(context).pop(true),
+          child: const Text('CONFIRM'),
+        ),
+      ],
+    ),
+  );
 
+  if (confirmed == true) {
+    await _updateRequestStatus(requestId, newStatus, data);
+    if (data['userPhone'] != null) {
+      final eventName = data['eventName'] ?? 'our event';
+      final price = (data['totalPrice'] ?? 0).toStringAsFixed(2);
+      
+      final message = newStatus == 'paid'
+          ? '''
+Thank you for your interest in our *$eventName* event!
+
+Your payment has been confirmed and your spot is now reserved. We look forward to seeing you there!
+
+Best regards,
+IEEE PUA SB
+'''
+          : '''
+Hello,
+
+We're contacting you regarding IEEE PUA SB event *$eventName*. 
+
+Your payment of *\$$price* is still pending. 
+Please complete your payment via:
+1. Instapay
+2. Vodafone Cash
+3. Cash in faculty
+
+Payment should be completed within 3 days to secure your spot.
+
+Please send us the payment confirmation once completed.
+
+Best regards,
+IEEE PUA SB
+''';
+
+      await _launchWhatsApp(data['userPhone'], message);
+    }
+  }
+}
+  Future<void> _launchWhatsApp(String phoneNumber, String message) async {
+    final cleanedNumber = phoneNumber.replaceAll(RegExp(r'[^0-9]'), '');
+    final formattedNumber =
+        cleanedNumber.startsWith('+') ? cleanedNumber : '+20$cleanedNumber';
+    final whatsappUrl =
+        "https://wa.me/$formattedNumber?text=${Uri.encodeComponent(message)}";
+
+    try {
+      if (await canLaunch(whatsappUrl)) {
+        await launch(whatsappUrl);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not launch WhatsApp')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error launching WhatsApp: $e')));
+    }
+  }
+
+  Color _getStatusColor(String? status) {
+    switch (status?.toLowerCase()) {
+      case 'paid':
+        return Colors.green;
+      case 'approved':
+        return Colors.blue;
+      case 'unpaid':
+        return Colors.orange;
+      case 'rejected':
+        return Colors.red;
+      case 'pending':
+        return Colors.grey;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  Future<void> _updateRequestStatus(
+    String requestId,
+    String newStatus,
+    Map<String, dynamic> data,
+  ) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('requests')
+          .doc(requestId)
+          .update({'status': newStatus});
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Request marked as $newStatus!'),
+          backgroundColor: newStatus == 'paid' ? Colors.green : Colors.orange,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to update request: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _confirmDeletion(BuildContext context, String requestId) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Deny Request'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('Please provide a reason for denying this request:'),
-                SizedBox(height: 10.sp),
-                TextField(
-                  controller: reasonController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'Enter reason here...',
-                  ),
-                ),
-              ],
+            title: Text(
+              'Delete Request',
+              style: TextStyle(color: WebsiteColors.primaryBlueColor),
+            ),
+            content: Text(
+              'Are you sure you want to delete this request? This action cannot be undone.',
+              style: TextStyle(color: WebsiteColors.darkBlueColor),
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancel'),
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(
+                  'CANCEL',
+                  style: TextStyle(color: WebsiteColors.darkBlueColor),
+                ),
               ),
               ElevatedButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('Deny'),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('DELETE'),
               ),
             ],
           ),
     );
 
     if (confirmed == true) {
-      final reason = reasonController.text.trim();
-      if (reason.isNotEmpty) {
-        // Update Firestore
-        await FirebaseFirestore.instance
-            .collection('requests')
-            .doc(requestId)
-            .update({'status': 'denied', 'rejectReason': reason});
-
-        // Notify User via Email and WhatsApp
-        _launchEmail(
-          userEmail,
-          subject: 'Request Denied',
-          body:
-              'Your request has been denied for the following reason: $reason',
-        );
-        _launchWhatsApp(
-          userPhone,
-          message:
-              'Your request has been denied for the following reason: $reason',
-        );
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Request denied and user notified.')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Reason cannot be empty.')),
-        );
-      }
+      await _deleteRequest(requestId);
     }
   }
 
-  /// Launch WhatsApp with the provided phone number and message
-  Future<void> _launchWhatsApp(String phone, {String? message}) async {
-    final url =
-        'https://wa.me/$phone?text=${Uri.encodeComponent(message ?? '')}';
-    if (await canLaunchUrl(Uri.parse(url))) {
-      await launchUrl(Uri.parse(url));
-    } else {
+  Future<void> _deleteRequest(String requestId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('requests')
+          .doc(requestId)
+          .delete();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not launch WhatsApp')),
+        const SnackBar(
+          content: Text('Request deleted successfully'),
+          backgroundColor: Colors.green,
+        ),
       );
-    }
-  }
-
-  /// Launch Email with the provided email address, subject, and body
-  Future<void> _launchEmail(
-    String email, {
-    String? subject,
-    String? body,
-  }) async {
-    final url =
-        'mailto:$email?subject=${Uri.encodeComponent(subject ?? '')}&body=${Uri.encodeComponent(body ?? '')}';
-    if (await canLaunchUrl(Uri.parse(url))) {
-      await launchUrl(Uri.parse(url));
-    } else {
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not launch email client')),
+        SnackBar(
+          content: Text('Failed to delete request: $e'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
