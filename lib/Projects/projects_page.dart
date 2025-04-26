@@ -136,10 +136,10 @@ class _ProjectsState extends State<Projects>
           padding: const EdgeInsets.all(16.0),
           child: GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, // Two cards per row
+              crossAxisCount: 3, 
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
-              childAspectRatio: 0.8, // Adjust card aspect ratio
+              childAspectRatio: 1, 
             ),
             itemCount: projects.length,
             itemBuilder: (context, index) {
@@ -276,7 +276,7 @@ class _ProjectsState extends State<Projects>
                           project.tags.map((tag) {
                             return Chip(
                               label: Text(tag),
-                              backgroundColor: WebsiteColors.gradientBlueColor,
+                              backgroundColor: WebsiteColors.gradeintBlueColor,
                               labelStyle: const TextStyle(
                                 color: WebsiteColors.primaryBlueColor,
                                 fontSize: 12,

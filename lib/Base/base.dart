@@ -5,7 +5,6 @@ import 'package:ieee_website/Contact_us/contact.dart';
 import 'package:ieee_website/Events/events.dart';
 import 'package:ieee_website/FAQ/faq.dart';
 import 'package:ieee_website/Home_screen/home_screen.dart';
-import 'package:ieee_website/Join_us/join.dart';
 import 'package:ieee_website/Projects/projects_page.dart';
 import 'package:ieee_website/Themes/website_colors.dart';
 
@@ -37,19 +36,23 @@ class _BaseState extends State<Base> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor:
-          WebsiteColors.whiteColor, // Explicitly set background color
+      backgroundColor: WebsiteColors.whiteColor,
+
+      // ✅ Custom AppBar with TabBar
       appBar: AppBar(
         toolbarHeight: 120.sp,
-        backgroundColor: WebsiteColors.primaryBlueColor.withOpacity(0.9),
+
+        backgroundColor: Colors.transparent,
         elevation: 0,
         flexibleSpace: Container(
-          decoration: BoxDecoration(color: WebsiteColors.primaryBlueColor),
+          decoration: BoxDecoration(
+            color: WebsiteColors.primaryBlueColor.withOpacity(0.7),
+          ),
         ),
         title: Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.0.sp),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // IEEE Logo
               Image.asset(
@@ -58,7 +61,7 @@ class _BaseState extends State<Base> with SingleTickerProviderStateMixin {
                 width: 160.sp,
               ),
 
-              // TabBar
+              // ✅ TabBar instead of Text links
               TabBar(
                 controller: _tabController,
                 isScrollable: true,
@@ -74,41 +77,19 @@ class _BaseState extends State<Base> with SingleTickerProviderStateMixin {
                   Tab(text: "FAQ"),
                 ],
               ),
-
-              // "Join Us" Button
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: WebsiteColors.whiteColor,
-                  foregroundColor: WebsiteColors.primaryBlueColor,
-                  fixedSize: Size(170.sp, 50.sp),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => JoinUs()),
-                  );
-                },
-                child: Text(
-                  'Join Us',
-                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                    fontSize: 20.sp,
-                    color: WebsiteColors.primaryBlueColor,
-                  ),
-                ),
-              ),
             ],
           ),
         ),
       ),
+
+      // ✅ Remove Footer from Base
       body: TabBarView(
         controller: _tabController,
         children: [
           HomeScreen(tabController: _tabController),
           AboutUs(tabController: _tabController),
-          AdminEventPage(tabController: _tabController),
-          Projects(
-            tabController: _tabController,
-          ), // Pass TabController to Projects
+          Events(tabController: _tabController),
+          Projects(tabController: _tabController),
           Contact(tabController: _tabController),
           FAQ(tabController: _tabController),
         ],

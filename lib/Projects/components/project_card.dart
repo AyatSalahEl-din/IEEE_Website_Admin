@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ieee_website/Projects/models/project_model.dart';
 import 'package:ieee_website/Themes/website_colors.dart';
 
@@ -17,11 +18,12 @@ class ProjectCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
+      color: Colors.white, // White background for the card
+      elevation: 2,
+      margin: EdgeInsets.all(4.sp),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
+      child: Padding(
+        padding: EdgeInsets.all(10.sp),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -77,7 +79,7 @@ class ProjectCard extends StatelessWidget {
                           project.tags.map((tag) {
                             return Chip(
                               label: Text(tag),
-                              backgroundColor: WebsiteColors.gradientBlueColor,
+                              backgroundColor: WebsiteColors.gradeintBlueColor,
                               labelStyle: const TextStyle(
                                 color: WebsiteColors.primaryBlueColor,
                                 fontSize: 12,
@@ -134,7 +136,8 @@ class ProjectCard extends StatelessWidget {
         ? Image.network(
           firstImage,
           width: double.infinity,
-          height: 150, // Fixed height for consistent card layout
+          height:40
+          , // Fixed height for consistent card layout
           fit: BoxFit.cover, // Ensure the image covers the available space
           errorBuilder:
               (context, error, stackTrace) => const Icon(
@@ -145,8 +148,8 @@ class ProjectCard extends StatelessWidget {
         )
         : Container(
           width: double.infinity,
-          height: 150, // Fixed height for consistent card layout
-          color: WebsiteColors.gradientBlueColor,
+          height: 40, // Fixed height for consistent card layout
+          color: WebsiteColors.gradeintBlueColor,
           child: const Icon(
             Icons.broken_image,
             size: 50,

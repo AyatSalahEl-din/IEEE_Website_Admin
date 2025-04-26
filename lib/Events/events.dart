@@ -11,17 +11,17 @@ import 'package:ieee_website/Events/managereq.dart';
 import 'package:ieee_website/Events/proposals.dart'; // Import the proposals widget
 //import 'package:cloud_firestore/cloud_firestore.dart'as firestore; // Alias added
 
-class AdminEventPage extends StatefulWidget {
+class Events extends StatefulWidget {
   static const String routeName = 'admin';
   final TabController? tabController;
 
-  AdminEventPage({super.key, this.tabController});
+  Events({super.key, this.tabController});
 
   @override
-  State<AdminEventPage> createState() => _AdminEventPageState();
+  State<Events> createState() => _EventsState();
 }
 
-class _AdminEventPageState extends State<AdminEventPage> {
+class _EventsState extends State<Events> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _categoryController = TextEditingController();

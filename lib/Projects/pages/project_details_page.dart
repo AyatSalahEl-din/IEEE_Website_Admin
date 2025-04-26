@@ -142,7 +142,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
         : Container(
           width: double.infinity,
           height: 300,
-          color: WebsiteColors.gradientBlueColor,
+          color: WebsiteColors.gradeintBlueColor,
           child: const Icon(
             Icons.broken_image,
             size: 50,
@@ -349,7 +349,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                         _project!.tags.map((tag) {
                           return Chip(
                             label: Text(tag),
-                            backgroundColor: WebsiteColors.gradientBlueColor,
+                            backgroundColor: WebsiteColors.gradeintBlueColor,
                             labelStyle: const TextStyle(
                               color: WebsiteColors.primaryBlueColor,
                               fontSize: 12,
@@ -373,7 +373,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: WebsiteColors.gradientBlueColor.withOpacity(0.3),
+                      color: WebsiteColors.gradeintBlueColor.withOpacity(0.3),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: WebsiteColors.primaryBlueColor.withOpacity(0.2),
