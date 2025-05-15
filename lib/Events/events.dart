@@ -213,7 +213,7 @@ class _EventsState extends State<Events> {
                   ),
                   
                   // Index 4: Proposals
-                  ProposalsWidget(),
+                  ManageProposalsWidget(),
                 ],
               ),
             ),

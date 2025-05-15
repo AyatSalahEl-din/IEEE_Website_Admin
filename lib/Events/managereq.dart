@@ -101,11 +101,7 @@ class _ManageRequestsWidgetState extends State<ManageRequestsWidget> {
               ),
 
               // Main Content Area
-              Expanded(
-                child: Container(
-                  child: _buildRequestList(constraints),
-                ),
-              ),
+              Expanded(child: Container(child: _buildRequestList(constraints))),
             ],
           ),
         );
@@ -241,6 +237,17 @@ class _ManageRequestsWidgetState extends State<ManageRequestsWidget> {
               ],
             ),
             SizedBox(height: 6.sp),
+
+            // Order number
+            Text(
+              'Order Number: ${data['orderNumber'] ?? 'N/A'}',
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.bold,
+                color: WebsiteColors.primaryBlueColor,
+              ),
+            ),
+            SizedBox(height: 8.sp),
 
             // Event name
             Text(
@@ -400,12 +407,14 @@ class _ManageRequestsWidgetState extends State<ManageRequestsWidget> {
     final price = (data['totalPrice'] ?? 0).toStringAsFixed(2);
     final busSeats =
         data['busRequired'] == true ? data['numberOfBusTickets'] ?? 0 : 0;
+    final orderNumber = data['orderNumber'] ?? 'N/A';
 
     final message = '''
 Hello ${data['userName'] ?? 'there'},
 
 I'm contacting you from IEEE PUA SB to confirm your booking for *$eventName*:
 
+- Order Number: $orderNumber
 - Tickets: $tickets
 ${busSeats > 0 ? '- Bus seats: $busSeats\n' : ''}
 - Total: \$$price
@@ -420,59 +429,68 @@ IEEE PUA SB
   }
 
   Future<void> _confirmStatusChange(
-  BuildContext context,
-  String requestId,
-  String newStatus,
-  Map<String, dynamic> data,
-  String dialogTitle,
-  String dialogContent,
-) async {
-  final confirmed = await showDialog<bool>(
-    context: context,
-    builder: (context) => AlertDialog(
-      backgroundColor: Colors.white,
-      title: Text(dialogTitle),
-      content: Text(dialogContent),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          child: Text(
-            'CANCEL',
-            style: TextStyle(color: WebsiteColors.darkBlueColor),
+    BuildContext context,
+    String requestId,
+    String newStatus,
+    Map<String, dynamic> data,
+    String dialogTitle,
+    String dialogContent,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            backgroundColor: Colors.white,
+            title: Text(dialogTitle),
+            content: Text(dialogContent),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(
+                  'CANCEL',
+                  style: TextStyle(color: WebsiteColors.darkBlueColor),
+                ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      newStatus == 'paid' ? Colors.green : Colors.orange,
+                ),
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('CONFIRM'),
+              ),
+            ],
           ),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: newStatus == 'paid' ? Colors.green : Colors.orange,
-          ),
-          onPressed: () => Navigator.of(context).pop(true),
-          child: const Text('CONFIRM'),
-        ),
-      ],
-    ),
-  );
+    );
 
-  if (confirmed == true) {
-    await _updateRequestStatus(requestId, newStatus, data);
-    if (data['userPhone'] != null) {
-      final eventName = data['eventName'] ?? 'our event';
-      final price = (data['totalPrice'] ?? 0).toStringAsFixed(2);
-      
-      final message = newStatus == 'paid'
-          ? '''
+    if (confirmed == true) {
+      await _updateRequestStatus(requestId, newStatus, data);
+      if (data['userPhone'] != null) {
+        final eventName = data['eventName'] ?? 'our event';
+        final price = (data['totalPrice'] ?? 0).toStringAsFixed(2);
+        final orderNumber = data['orderNumber'] ?? 'N/A';
+
+        final message =
+            newStatus == 'paid'
+                ? '''
 Thank you for your interest in our *$eventName* event!
 
-Your payment has been confirmed and your spot is now reserved. We look forward to seeing you there!
+Your payment has been confirmed and your spot is now reserved. 
+- Order Number: $orderNumber
+
+We look forward to seeing you there!
 
 Best regards,
 IEEE PUA SB
 '''
-          : '''
+                : '''
 Hello,
 
 We're contacting you regarding IEEE PUA SB event *$eventName*. 
 
 Your payment of *\$$price* is still pending. 
+- Order Number: $orderNumber
+
 Please complete your payment via:
 1. Instapay
 2. Vodafone Cash
@@ -486,10 +504,11 @@ Best regards,
 IEEE PUA SB
 ''';
 
-      await _launchWhatsApp(data['userPhone'], message);
+        await _launchWhatsApp(data['userPhone'], message);
+      }
     }
   }
-}
+
   Future<void> _launchWhatsApp(String phoneNumber, String message) async {
     final cleanedNumber = phoneNumber.replaceAll(RegExp(r'[^0-9]'), '');
     final formattedNumber =
