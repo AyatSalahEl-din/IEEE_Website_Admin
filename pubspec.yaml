@@ -50,7 +50,8 @@ dependencies:
   connectivity_plus: ^5.0.2
   firebase_storage: ^12.1.4
   uuid: ^4.4.0
-
+  flutter_form_builder: ^9.1.0
+  form_builder_validators: ^11.1.2
 
 dev_dependencies:
   flutter_test:
