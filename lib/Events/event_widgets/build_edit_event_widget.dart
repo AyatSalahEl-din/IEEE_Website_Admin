@@ -127,7 +127,7 @@ class _EditEventWidgetState extends State<EditEventWidget> {
 
                             // Details
                             Padding(
-                              padding: const EdgeInsets.all(12),
+                              padding:  EdgeInsets.all(15.sp),
                               child: Column(
                                 children: [
                                   Text(
@@ -137,6 +137,7 @@ class _EditEventWidgetState extends State<EditEventWidget> {
                                         fontWeight: FontWeight.bold,
                                         color: WebsiteColors.primaryBlueColor),
                                     textAlign: TextAlign.center,
+                                    maxLines: 1,
                                   ),
                                    SizedBox(height: 10.sp),
                                   Row(
@@ -161,7 +162,7 @@ class _EditEventWidgetState extends State<EditEventWidget> {
                             // Edit Button
                             const Spacer(),
                             Padding(
-                              padding:  EdgeInsets.symmetric(horizontal: 20.sp, vertical: 20.sp),
+                              padding:  EdgeInsets.symmetric(horizontal: 20.sp, vertical: 40.sp),
                               child: ElevatedButton.icon(
                                 onPressed: () {
                                   Navigator.push(
