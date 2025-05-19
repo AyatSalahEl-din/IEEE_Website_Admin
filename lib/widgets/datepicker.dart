@@ -1,34 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ieee_website/Themes/website_colors.dart';
+import 'package:intl/intl.dart';
 
-class DatePickerWidget extends StatelessWidget {
-  final DateTime selectedDate;
-  final ValueChanged<DateTime> onDateChanged;
+class CustomDatePicker extends StatelessWidget {
+  final Function(DateTime?) onDatePicked;
+  final DateTime? initialDate;
 
-  const DatePickerWidget({
-    Key? key,
-    required this.selectedDate,
-    required this.onDateChanged,
-  }) : super(key: key);
+  const CustomDatePicker({super.key, required this.onDatePicked, this.initialDate});
+  
+  get selectedDate => initialDate ?? DateTime.now();
+  get formattedDate => DateFormat('dd/MM/yyyy').format(selectedDate);
 
   @override
+ 
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
         final DateTime? picked = await showDatePicker(
           context: context,
           initialDate: selectedDate,
-          firstDate: DateTime.now(),
-          lastDate: DateTime(2025),
+          firstDate: DateTime(2014),
+          lastDate: DateTime(2100),
           builder: (context, child) {
             return Theme(
               data: Theme.of(context).copyWith(
+             
                 colorScheme: ColorScheme.light(
                   primary: WebsiteColors.primaryBlueColor,
+                  onPrimary: Colors.white,
+                  onSurface: WebsiteColors.darkBlueColor,
                 ),
-                // Customize additional date picker styles here
+                textButtonTheme: TextButtonThemeData(
+                  style: TextButton.styleFrom(
+                    foregroundColor: WebsiteColors.primaryBlueColor,
+                    
+                  ),
+                ),
                 textTheme: TextTheme(
-                  titleLarge: TextStyle(color: WebsiteColors.darkGreyColor),
+                  bodyMedium: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               child: child!,
@@ -36,11 +51,11 @@ class DatePickerWidget extends StatelessWidget {
           },
         );
         if (picked != null) {
-          onDateChanged(picked);
+          onDatePicked(picked);
         }
       },
       child: Container(
-        padding: EdgeInsets.all(15),
+        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
           color: Colors.grey[100],
           borderRadius: BorderRadius.circular(10),
@@ -48,10 +63,7 @@ class DatePickerWidget extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(
-              Icons.calendar_today,
-              color: WebsiteColors.primaryBlueColor,
-            ),
+            Icon(Icons.calendar_today, color: WebsiteColors.primaryBlueColor),
             SizedBox(width: 10),
             Text(
               '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',

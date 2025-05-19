@@ -1,14 +1,14 @@
-import 'dart:typed_data';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:ieee_website/Projects/models/project_model.dart';
 import 'package:ieee_website/Projects/services/project_service.dart';
 import 'package:ieee_website/Themes/website_colors.dart';
 
 class UpdateProjectPage extends StatefulWidget {
   final Project project;
-
-  const UpdateProjectPage({Key? key, required this.project}) : super(key: key);
+  final List<String>? imageUrls;
+  const UpdateProjectPage({Key? key, required this.project, this.imageUrls})
+    : super(key: key);
 
   @override
   State<UpdateProjectPage> createState() => _UpdateProjectPageState();
@@ -20,27 +20,45 @@ class _UpdateProjectPageState extends State<UpdateProjectPage> {
 
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;
+  final _tagsController = TextEditingController();
+  final _madeByController = TextEditingController();
+  DateTime _selectedDate = DateTime.now();
 
-  Uint8List? _selectedImage;
-  String _imageName = '';
   bool _isLoading = false;
-  bool _imageChanged = false;
 
   // Additional details controllers
   final Map<String, TextEditingController> _additionalDetailsControllers = {};
   final List<String> _additionalDetailKeys = [];
+  List<String>? imageUrls;
+  final List<TextEditingController> _imageControllers =
+      []; // List to handle multiple image URLs
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.project.name);
-    _descriptionController = TextEditingController(
-      text: widget.project.description,
-    );
+    imageUrls =
+        widget.project.imageUrls?.where((url) => url.isNotEmpty).toList() ??
+        []; // Filter out empty URLs
+    for (final url in imageUrls!) {
+      _imageControllers.add(
+        TextEditingController(text: url),
+      ); // Initialize controllers with existing URLs
+    }
+    if (_imageControllers.isEmpty) {
+      _imageControllers.add(
+        TextEditingController(),
+      ); // Add at least one controller
+    }
+    _nameController = TextEditingController();
+    _descriptionController = TextEditingController();
+    _tagsController.text =
+        widget.project.tags.isNotEmpty ? widget.project.tags.join(', ') : '';
+    _madeByController.text = widget.project.madeBy ?? '';
+    // _selectedDate = widget.project.date ?? DateTime.now();
 
     // Initialize additional details
     int index = 0;
-    widget.project.additionalDetails.forEach((key, value) {
+    widget.project.additionalDetails?.forEach((key, value) {
       final fieldKey = 'detail_$index';
       _additionalDetailKeys.add(fieldKey);
       _additionalDetailsControllers[fieldKey] = TextEditingController(
@@ -54,25 +72,15 @@ class _UpdateProjectPageState extends State<UpdateProjectPage> {
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
+    _tagsController.dispose();
+    _madeByController.dispose();
+    for (final controller in _imageControllers) {
+      controller.dispose();
+    }
     for (final controller in _additionalDetailsControllers.values) {
       controller.dispose();
     }
     super.dispose();
-  }
-
-  Future<void> _pickImage() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-      allowMultiple: false,
-    );
-
-    if (result != null && result.files.isNotEmpty) {
-      setState(() {
-        _selectedImage = result.files.first.bytes;
-        _imageName = result.files.first.name;
-        _imageChanged = true;
-      });
-    }
   }
 
   void _addDetailField() {
@@ -91,6 +99,19 @@ class _UpdateProjectPageState extends State<UpdateProjectPage> {
     });
   }
 
+  void _addImageField() {
+    setState(() {
+      _imageControllers.add(TextEditingController());
+    });
+  }
+
+  void _removeImageField(int index) {
+    setState(() {
+      _imageControllers[index].dispose();
+      _imageControllers.removeAt(index);
+    });
+  }
+
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
@@ -98,6 +119,13 @@ class _UpdateProjectPageState extends State<UpdateProjectPage> {
       });
 
       try {
+        // Gather image URLs
+        final updatedImageUrls =
+            _imageControllers
+                .map((controller) => controller.text.trim())
+                .where((url) => url.isNotEmpty)
+                .toList();
+
         // Gather additional details
         final additionalDetails = <String, dynamic>{};
         for (final key in _additionalDetailKeys) {
@@ -112,35 +140,28 @@ class _UpdateProjectPageState extends State<UpdateProjectPage> {
           }
         }
 
-        // Handle image upload if changed
-        String? imageUrl = widget.project.imageUrl;
-        if (_imageChanged && _selectedImage != null) {
-          final sanitizedImageName = _imageName.replaceAll(
-            RegExp(r'[^\w\-.]'),
-            '_',
-          );
-          imageUrl = await _projectService.uploadProjectImage(
-            imageBytes: _selectedImage!,
-            imageName: sanitizedImageName,
-          );
-
-          if (imageUrl == null) {
-            throw Exception('Failed to upload image.');
-          }
-        }
-
         // Create updated project
         final updatedProject = Project(
-          id: widget.project.id, // Use the existing project ID
-          name: _nameController.text,
+          id: widget.project.id,
+          title: _nameController.text,
           description: _descriptionController.text,
-          imageUrl: imageUrl, // Nullable imageUrl
-          createdAt: widget.project.createdAt,
-          additionalDetails: additionalDetails,
+          madeBy:
+              _madeByController.text.trim().isNotEmpty
+                  ? _madeByController.text.trim()
+                  : 'Unknown',
+          date: _selectedDate,
+          tags:
+              _tagsController.text.split(',').map((tag) => tag.trim()).toList(),
+          imageUrls: updatedImageUrls,
+          additionalDetails:
+              additionalDetails.isNotEmpty ? additionalDetails : null,
         );
 
         // Update in Firebase
-        await _projectService.updateProject(updatedProject, null, null);
+        await _projectService.updateProject(
+          updatedProject,
+          widget.project.additionalDetails,
+        );
 
         // Show success message
         if (mounted) {
@@ -170,12 +191,12 @@ class _UpdateProjectPageState extends State<UpdateProjectPage> {
     }
   }
 
-  Widget _buildImageUploadSection() {
+  Widget _buildTagsInput() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Project Image',
+          'Tags',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -183,56 +204,257 @@ class _UpdateProjectPageState extends State<UpdateProjectPage> {
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          height: 250, // Increased height
-          width: 300, // Reduced width
-          decoration: BoxDecoration(
-            color: WebsiteColors.gradeintBlueColor,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade300),
+        TextFormField(
+          controller: _tagsController,
+          decoration: InputDecoration(
+            hintText: 'Enter tags separated by commas',
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(
+                color: WebsiteColors.primaryBlueColor,
+                width: 2,
+              ),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 8,
+              horizontal: 12,
+            ),
           ),
-          child:
-              _selectedImage != null
-                  ? ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.memory(_selectedImage!, fit: BoxFit.cover),
-                  )
-                  : widget.project.imageUrl!.isNotEmpty
-                  ? ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.network(
-                      '${widget.project.imageUrl}=w400', // Append "=w400"
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Center(
-                          child: Icon(
-                            Icons.image_not_supported,
-                            size: 48,
-                            color: WebsiteColors.primaryBlueColor,
-                          ),
-                        );
-                      },
+          style: const TextStyle(fontSize: 14),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMadeByInput() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Made By (Optional)',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: WebsiteColors.darkGreyColor,
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: _madeByController,
+          decoration: InputDecoration(
+            hintText: 'Enter creator name (Optional)',
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(
+                color: WebsiteColors.primaryBlueColor,
+                width: 2,
+              ),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 8,
+              horizontal: 12,
+            ),
+          ),
+          style: const TextStyle(fontSize: 14),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDatePicker() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Project Date (Optional)',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: WebsiteColors.darkGreyColor,
+          ),
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: () async {
+            final pickedDate = await showDatePicker(
+              context: context,
+              initialDate: _selectedDate,
+              firstDate: DateTime(2000),
+              lastDate: DateTime(2100),
+              builder: (context, child) {
+                return Theme(
+                  data: Theme.of(context).copyWith(
+                    colorScheme: ColorScheme.light(
+                      primary: WebsiteColors.primaryBlueColor,
+                      onPrimary: Colors.white,
+                      onSurface: WebsiteColors.darkBlueColor,
                     ),
-                  )
-                  : const Center(
-                    child: Icon(
-                      Icons.image,
-                      size: 48,
-                      color: WebsiteColors.primaryBlueColor,
-                    ),
+                    textButtonTheme: TextButtonThemeData(
+                      style: TextButton.styleFrom(
+                        foregroundColor: WebsiteColors.primaryBlueColor,
+                      ),
+                    ),textTheme: TextTheme(
+                  bodyMedium: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
+                ),
+                  ),
+                  child: child!,
+                );
+              },
+            );
+            if (pickedDate != null) {
+              setState(() {
+                _selectedDate = pickedDate;
+              });
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade300),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+              style: const TextStyle(fontSize: 14),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAdditionalDetailsFields() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Additional Details',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: WebsiteColors.darkGreyColor,
+              ),
+            ),
+            ElevatedButton.icon(
+              onPressed: _addDetailField,
+              icon: const Icon(Icons.add),
+              label: const Text('Add Field'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: WebsiteColors.primaryBlueColor,
+                foregroundColor: WebsiteColors.whiteColor,
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 12),
-        Center(
-          child: ElevatedButton.icon(
-            onPressed: _pickImage,
-            icon: const Icon(Icons.add_photo_alternate),
-            label: const Text('Change Image'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: WebsiteColors.primaryBlueColor,
-              foregroundColor: WebsiteColors.whiteColor,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        ..._additionalDetailKeys.map((key) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: _additionalDetailsControllers[key],
+                    decoration: InputDecoration(
+                      hintText: 'Key: Value (e.g., Team Size: 5)',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(
+                          color: WebsiteColors.darkBlueColor,
+                          width: 2,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 12,
+                      ),
+                    ),
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () => _removeDetailField(key),
+                ),
+              ],
             ),
+          );
+        }).toList(),
+      ],
+    );
+  }
+
+  Widget _buildImageInputs() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Image URLs',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: WebsiteColors.darkGreyColor,
+          ),
+        ),
+        const SizedBox(height: 8),
+        ..._imageControllers.asMap().entries.map((entry) {
+          final index = entry.key;
+          final controller = entry.value;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: controller,
+                    decoration: InputDecoration(
+                      hintText: 'Enter image URL',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(
+                          color: WebsiteColors.primaryBlueColor,
+                          width: 2,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 12,
+                      ),
+                    ),
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ),
+                if (_imageControllers.length > 1)
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () => _removeImageField(index),
+                  ),
+              ],
+            ),
+          );
+        }).toList(),
+        ElevatedButton.icon(
+          onPressed: _addImageField,
+          icon: const Icon(Icons.add),
+          label: const Text('Add Image'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: WebsiteColors.primaryBlueColor,
+            foregroundColor: WebsiteColors.whiteColor,
           ),
         ),
       ],
@@ -329,63 +551,26 @@ class _UpdateProjectPageState extends State<UpdateProjectPage> {
                   return null;
                 },
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
 
-              // Image Upload
-              _buildImageUploadSection(),
+              // Image Inputs
+              _buildImageInputs(),
+              const SizedBox(height: 16),
+
+              // Made By Input
+              _buildMadeByInput(),
+              const SizedBox(height: 16),
+
+              // Tags Input
+              _buildTagsInput(),
+              const SizedBox(height: 16),
+
+              // Project Date
+              _buildDatePicker(),
               const SizedBox(height: 24),
 
               // Additional Details
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Additional Details',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: WebsiteColors.darkGreyColor,
-                    ),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: _addDetailField,
-                    icon: const Icon(Icons.add),
-                    label: const Text('Add Field'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: WebsiteColors.primaryBlueColor,
-                      foregroundColor: WebsiteColors.whiteColor,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // Dynamic additional details fields
-              ..._additionalDetailKeys.map((key) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          controller: _additionalDetailsControllers[key],
-                          decoration: InputDecoration(
-                            hintText: 'Key: Value (e.g., Team Size: 5)',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => _removeDetailField(key),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-
+              _buildAdditionalDetailsFields(),
               const SizedBox(height: 32),
 
               // Submit button
@@ -422,5 +607,66 @@ class _UpdateProjectPageState extends State<UpdateProjectPage> {
         ),
       ),
     );
+  }
+}
+
+void updateProject({
+  required BuildContext context,
+  required String projectId,
+  required GlobalKey<FormState> formKey,
+  required TextEditingController titleController,
+  required TextEditingController categoryController,
+  required TextEditingController descriptionController,
+  required List<String> imageUrls,
+  required DateTime? selectedDate,
+  required Function(bool) setLoading,
+}) async {
+  if (!formKey.currentState!.validate()) {
+    return;
+  }
+  setLoading(true);
+
+  try {
+    // Convert category to uppercase
+    final category = categoryController.text.trim().toUpperCase();
+
+    // Check if the category already exists in Firestore
+    final existingCategories =
+        await FirebaseFirestore.instance
+            .collection('projects')
+            .where('category', isEqualTo: category)
+            .get();
+
+    if (existingCategories.docs.isNotEmpty) {
+      // If the category exists, use the existing category name
+      categoryController.text = existingCategories.docs.first['category'];
+    } else {
+      // Otherwise, save the category in uppercase
+      categoryController.text = category;
+    }
+
+    final updatedData = {
+      'title': titleController.text.trim(),
+      'category': categoryController.text.trim(),
+      'description': descriptionController.text.trim(),
+      'imageUrls': imageUrls,
+      'date': selectedDate != null ? Timestamp.fromDate(selectedDate) : null,
+    };
+
+    await FirebaseFirestore.instance
+        .collection('projects')
+        .doc(projectId)
+        .update(updatedData);
+
+    setLoading(false);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Project updated successfully!')),
+    );
+  } catch (e) {
+    setLoading(false);
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Error: $e')));
   }
 }

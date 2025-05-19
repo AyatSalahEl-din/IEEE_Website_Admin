@@ -1,42 +1,84 @@
+import 'package:flutter/foundation.dart';
+
 class Project {
   final String id;
-  final String name;
+  final String title;
   final String description;
-  final String? imageUrl; // Make imageUrl nullable
-  final DateTime createdAt;
-  final Map<String, dynamic> additionalDetails;
+  final String? madeBy; // Optional
+  final DateTime date;
+  final List<String> tags;
+  final List<String>? imageUrls; // Optional
+  final Map<String, dynamic>? additionalDetails;
 
   Project({
     required this.id,
-    required this.name,
+    required this.title,
     required this.description,
-    this.imageUrl, // Nullable imageUrl
-    DateTime? createdAt,
-    Map<String, dynamic>? additionalDetails,
-  }) : createdAt = createdAt ?? DateTime.now(),
-       additionalDetails = additionalDetails ?? {};
+    this.madeBy, // Optional
+    required this.date,
+    required this.tags,
+    this.imageUrls, // Optional
+    this.additionalDetails,
+  });
 
-  factory Project.fromFirestore(Map<String, dynamic> data, String id) {
-    return Project(
-      id: id,
-      name: data['name'] ?? 'No Name',
-      description: data['description'] ?? 'No Description',
-      imageUrl: data['imageUrl'], // Handle nullable imageUrl
-      createdAt:
-          data['createdAt'] != null
-              ? DateTime.parse(data['createdAt'])
-              : DateTime.now(),
-      additionalDetails: data['additionalDetails'] ?? {},
-    );
+  // Convert from Firebase/JSON
+  factory Project.fromFirestore(Map<String, dynamic> json, String id) {
+    try {
+      final List<String>? imageUrls =
+          json['imageUrls'] != null
+              ? List<String>.from(json['imageUrls'] as List)
+                  .where((url) => url.isNotEmpty)
+                  .toList() // Filter out empty URLs
+              : [];
+      return Project(
+        id: id,
+        title: json['title'] as String? ?? 'Untitled Project', // Default title
+        description:
+            json['description'] as String? ??
+            'No description provided', // Default description
+        madeBy: json['madeBy'] as String?, // Optional field
+        date:
+            json['date'] != null
+                ? DateTime.tryParse(json['date'] as String) ??
+                    DateTime.now() // Default to current date if parsing fails
+                : DateTime.now(),
+        tags: List<String>.from(
+          json['tags'] as List? ?? [],
+        ), // Default to empty list if null
+        imageUrls: imageUrls, // Ensure this is correctly mapped
+        additionalDetails:
+            json['additionalDetails']
+                as Map<String, dynamic>?, // Optional field
+      );
+    } catch (e) {
+      debugPrint('Error in Project.fromFirestore for ID $id: $e'); // Debug log
+      rethrow;
+    }
   }
 
+  // Convert to Firebase/JSON
   Map<String, dynamic> toFirestore() {
     return {
-      'name': name,
+      'title': title,
       'description': description,
-      if (imageUrl != null) 'imageUrl': imageUrl, // Include only if not null
-      'createdAt': createdAt.toIso8601String(),
-      'additionalDetails': additionalDetails,
+      if (madeBy != null) 'madeBy': madeBy,
+      'date': date.toIso8601String(),
+      'tags': tags,
+      if (imageUrls != null) 'imageUrls': imageUrls,
+      if (additionalDetails != null) 'additionalDetails': additionalDetails,
     };
+  }
+
+  // Search helper method
+  bool matchesSearch(String query) {
+    final searchQuery = query.toLowerCase();
+    return title.toLowerCase().contains(searchQuery) ||
+        description.toLowerCase().contains(searchQuery) ||
+        (madeBy?.toLowerCase().contains(searchQuery) ?? false) ||
+        tags.any((tag) => tag.toLowerCase().contains(searchQuery)) ||
+        (additionalDetails?.values.any(
+              (value) => value.toString().toLowerCase().contains(searchQuery),
+            ) ??
+            false);
   }
 }

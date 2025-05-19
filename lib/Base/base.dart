@@ -38,14 +38,18 @@ class _BaseState extends State<Base> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor:
-          WebsiteColors.whiteColor, // Explicitly set background color
+      backgroundColor: WebsiteColors.whiteColor,
+
+      // ✅ Custom AppBar with TabBar
       appBar: AppBar(
         toolbarHeight: 120.sp,
-        backgroundColor: WebsiteColors.primaryBlueColor.withOpacity(0.9),
+
+        backgroundColor: Colors.transparent,
         elevation: 0,
         flexibleSpace: Container(
-          decoration: BoxDecoration(color: WebsiteColors.primaryBlueColor),
+          decoration: BoxDecoration(
+            color: WebsiteColors.primaryBlueColor.withOpacity(0.7),
+          ),
         ),
         title: Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.0.sp),
@@ -59,7 +63,7 @@ class _BaseState extends State<Base> with SingleTickerProviderStateMixin {
                 width: 160.sp,
               ),
 
-              // TabBar
+              // ✅ TabBar instead of Text links
               TabBar(
                 controller: _tabController,
                 isScrollable: true,
@@ -79,12 +83,14 @@ class _BaseState extends State<Base> with SingleTickerProviderStateMixin {
           ),
         ),
       ),
+
+      // ✅ Remove Footer from Base
       body: TabBarView(
         controller: _tabController,
         children: [
           HomeScreen(tabController: _tabController),
           AboutUs(tabController: _tabController),
-          AdminEventPage(tabController: _tabController),
+          Events(tabController: _tabController),
           Projects(
             tabController: _tabController,
           ), // Pass TabController to Projects

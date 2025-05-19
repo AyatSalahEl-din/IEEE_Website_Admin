@@ -153,7 +153,7 @@ class _EventsCardState extends State<EventsCard> {
     List<String>? localImages = EventsCard.eventImageMap[widget.event.name];
     String? firstImage;
 
-    if (firebaseImages != null && firebaseImages.isNotEmpty) {
+    if (firebaseImages.isNotEmpty) {
       firstImage = firebaseImages.first;
     } else if (localImages != null && localImages.isNotEmpty) {
       firstImage = localImages.first;
