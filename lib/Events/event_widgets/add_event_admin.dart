@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-<<<<<<< HEAD
-=======
-import 'package:intl/intl.dart';
->>>>>>> 6d52d1a9d504456e9b0cc888201745ae3e0e7282
 
 void addEvent({
   required BuildContext context,
@@ -19,7 +15,6 @@ void addEvent({
   required bool isLoading,
   required Function(bool) setLoading,
   required Function() resetForm,
-<<<<<<< HEAD
   required TextEditingController ticketPriceController,
   required TextEditingController discountController,
   required TextEditingController discountForController,
@@ -49,10 +44,6 @@ void addEvent({
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Please fill all required fields.')),
     );
-=======
-}) async {
-  if (!formKey.currentState!.validate()) {
->>>>>>> 6d52d1a9d504456e9b0cc888201745ae3e0e7282
     return;
   }
 
@@ -61,18 +52,13 @@ void addEvent({
   try {
     final eventData = {
       'name': nameController.text.trim(),
-<<<<<<< HEAD
       'category': categoryController.text.trim().toUpperCase(),
-=======
-      'category': categoryController.text.trim(),
->>>>>>> 6d52d1a9d504456e9b0cc888201745ae3e0e7282
       'details': descriptionController.text.trim(),
       'location': locationController.text.trim(),
       'time': timeController.text.trim(),
       'imageUrls': imageUrls,
       'date': selectedDate != null ? Timestamp.fromDate(selectedDate) : null,
       'month': selectedMonth,
-<<<<<<< HEAD
       'isOnlineEvent': isOnlineEvent,
       if (isOnlineEvent) ...{
         'appTime': appTimeController.text.trim(),
@@ -127,27 +113,5 @@ void addEvent({
     ).showSnackBar(SnackBar(content: Text('Error adding event: $e')));
   } finally {
     setLoading(false);
-=======
-      //'created_at': Timestamp.now(),
-    };
-
-    // Add the event to Firebase Firestore
-    await FirebaseFirestore.instance.collection('events').add(eventData);
-
-    resetForm();
-
-    setLoading(false);
-
-    // Show a success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Event added successfully!')),
-    );
-  } catch (e) {
-    setLoading(false);
-    // Show an error message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error: $e')),
-    );
->>>>>>> 6d52d1a9d504456e9b0cc888201745ae3e0e7282
   }
 }

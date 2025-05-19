@@ -374,7 +374,6 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: WebsiteColors.gradeintBlueColor.withOpacity(0.3),
-                      color: WebsiteColors.gradeintBlueColor.withOpacity(0.3),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: WebsiteColors.primaryBlueColor.withOpacity(0.2),

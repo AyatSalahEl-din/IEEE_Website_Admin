@@ -11,15 +11,11 @@ class EditEventPage extends StatefulWidget {
   final String eventId;
   final Map<String, dynamic> eventData;
 
-<<<<<<< HEAD
   const EditEventPage({
     super.key,
     required this.eventId,
     required this.eventData,
   });
-=======
-  const EditEventPage({super.key, required this.eventId, required this.eventData});
->>>>>>> 6d52d1a9d504456e9b0cc888201745ae3e0e7282
 
   @override
   State<EditEventPage> createState() => _EditEventPageState();
@@ -34,7 +30,6 @@ class _EditEventPageState extends State<EditEventPage> {
   late TextEditingController _timeController;
   List<String> _imageUrls = [];
   DateTime? _selectedDate;
-<<<<<<< HEAD
   // ignore: unused_field
   bool _isLoading = false;
   late TextEditingController _ticketPriceController;
@@ -61,14 +56,10 @@ class _EditEventPageState extends State<EditEventPage> {
   late TextEditingController _appTimeController;
   late TextEditingController _appUrlController;
   late TextEditingController _appNameController;
-=======
-  bool _isLoading = false;
->>>>>>> 6d52d1a9d504456e9b0cc888201745ae3e0e7282
 
   @override
   void initState() {
     super.initState();
-<<<<<<< HEAD
     _initializeControllers();
   }
 
@@ -202,15 +193,6 @@ class _EditEventPageState extends State<EditEventPage> {
     _ticketLimitController.dispose();
     _numberOfBusesController.dispose();
     _seatsPerBusController.dispose();
-=======
-    _nameController = TextEditingController(text: widget.eventData['name']);
-    _categoryController = TextEditingController(text: widget.eventData['category']);
-    _descriptionController = TextEditingController(text: widget.eventData['details']);
-    _locationController = TextEditingController(text: widget.eventData['location']);
-    _timeController = TextEditingController(text: widget.eventData['time']);
-    _imageUrls = List<String>.from(widget.eventData['imageUrls'] ?? []);
-    _selectedDate = (widget.eventData['date'] as Timestamp).toDate();
->>>>>>> 6d52d1a9d504456e9b0cc888201745ae3e0e7282
   }
 
   Future<void> _updateEvent() async {
@@ -218,7 +200,6 @@ class _EditEventPageState extends State<EditEventPage> {
 
     setState(() => _isLoading = true);
 
-<<<<<<< HEAD
     try {
       final category = _categoryController.text.trim().toUpperCase();
       final existingCategories =
@@ -318,27 +299,6 @@ class _EditEventPageState extends State<EditEventPage> {
   Future<void> _addImage() async {
     final urlController = TextEditingController();
     final result = await showDialog<String>(
-=======
-    await FirebaseFirestore.instance.collection('events').doc(widget.eventId).update({
-      'name': _nameController.text,
-      'category': _categoryController.text,
-      'details': _descriptionController.text,
-      'location': _locationController.text,
-      'time': _timeController.text,
-      'date': _selectedDate,
-      'month': DateFormat.MMMM().format(_selectedDate!),
-      'imageUrls': _imageUrls,
-    });
-
-    setState(() => _isLoading = false);
-    if (mounted) Navigator.pop(context); // go back after saving
-  }
-
-  Future<void> _addImage() async {
-    TextEditingController urlController = TextEditingController();
-
-    showDialog(
->>>>>>> 6d52d1a9d504456e9b0cc888201745ae3e0e7282
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -355,14 +315,10 @@ class _EditEventPageState extends State<EditEventPage> {
             controller: urlController,
             decoration: InputDecoration(
               hintText: "Enter image URL",
-<<<<<<< HEAD
               hintStyle: TextStyle(
                 color: WebsiteColors.greyColor,
                 fontSize: 32.sp,
               ),
-=======
-              hintStyle: TextStyle(color: WebsiteColors.greyColor, fontSize: 32.sp),
->>>>>>> 6d52d1a9d504456e9b0cc888201745ae3e0e7282
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8.0.sp),
                 borderSide: BorderSide(color: WebsiteColors.primaryBlueColor),
@@ -374,7 +330,6 @@ class _EditEventPageState extends State<EditEventPage> {
             ),
           ),
           actions: [
-<<<<<<< HEAD
             TextButton(
               child: const Text('Cancel'),
               onPressed: () => Navigator.pop(context),
@@ -383,37 +338,11 @@ class _EditEventPageState extends State<EditEventPage> {
               child: const Text('Add'),
               onPressed:
                   () => Navigator.pop(context, urlController.text.trim()),
-=======
-            ElevatedButton(
-              child: const Text('Cancel'),
-              onPressed: () => Navigator.pop(context),
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: 10.sp, horizontal: 15.sp),
-                foregroundColor: Colors.black,
-                backgroundColor: Colors.grey,
-              ),
-            ),
-            ElevatedButton(
-              child: const Text('Add'),
-              onPressed: () {
-                final url = urlController.text.trim();
-                if (url.isNotEmpty) {
-                  setState(() => _imageUrls.add(url));
-                }
-                Navigator.pop(context); // Close dialog
-              },
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: 6.sp, horizontal: 10.sp),
-                foregroundColor: WebsiteColors.whiteColor,
-                backgroundColor: WebsiteColors.primaryBlueColor,
-              ),
->>>>>>> 6d52d1a9d504456e9b0cc888201745ae3e0e7282
             ),
           ],
         );
       },
     );
-<<<<<<< HEAD
 
     if (result != null && result.isNotEmpty) {
       setState(() => _imageUrls.add(result));
@@ -681,8 +610,6 @@ class _EditEventPageState extends State<EditEventPage> {
         SizedBox(height: 20.sp),
       ],
     );
-=======
->>>>>>> 6d52d1a9d504456e9b0cc888201745ae3e0e7282
   }
 
   @override
@@ -692,7 +619,6 @@ class _EditEventPageState extends State<EditEventPage> {
         title: const Text("Edit Event"),
         backgroundColor: WebsiteColors.primaryBlueColor,
       ),
-<<<<<<< HEAD
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(20.sp),
@@ -807,96 +733,6 @@ class _EditEventPageState extends State<EditEventPage> {
                 SizedBox(height: 20.sp),
               ],
             ),
-=======
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              SizedBox(height: 25.sp),
-              CustomTextFormField(controller: _nameController, labelText: "Event Name", icon: Icons.event),
-              SizedBox(height: 25.sp),
-              CustomTextFormField(controller: _categoryController, labelText: "Category", icon: Icons.category),
-              SizedBox(height: 25.sp),
-              CustomTextFormField(controller: _descriptionController, labelText: "Description", icon: Icons.description, isMultiline: true),
-              SizedBox(height: 25.sp),
-              CustomTextFormField(controller: _locationController, labelText: "Location", icon: Icons.location_on),
-              SizedBox(height: 25.sp),
-              CustomTextFormField(controller: _timeController, labelText: "Time", icon: Icons.access_time),
-              SizedBox(height: 25.sp),
-
-              // Use CustomDatePicker widget here
-              CustomDatePicker(
-                initialDate: _selectedDate,
-                onDatePicked: (newDateTime) {
-                  setState(() {
-                    _selectedDate = newDateTime;
-                  });
-                },
-              ),
-
-              const SizedBox(height: 20),
-
-              if (_imageUrls.isNotEmpty)
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _imageUrls.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 1,
-                  ),
-                  itemBuilder: (context, index) {
-                    final url = _imageUrls[index];
-                    return Stack(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.network(
-                            url,
-                            width: double.infinity,
-                            height: double.infinity,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, size: 40),
-                          ),
-                        ),
-                        Positioned(
-                          top: 8,
-                          right: 8,
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              color: Colors.black54,
-                              shape: BoxShape.circle,
-                            ),
-                            child: IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.white, size: 20),
-                              onPressed: () => setState(() => _imageUrls.removeAt(index)),
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              const SizedBox(height: 16),
-
-              // Add Image Button
-              CustomElevatedButton(
-                label: '+ Add Image',
-                onPressed: _addImage,
-              ),
-
-              const SizedBox(height: 24),
-              CustomElevatedButton(
-                label: 'Update Event',
-                onPressed: _updateEvent,
-              ),
-              const SizedBox(height: 20),
-            ],
->>>>>>> 6d52d1a9d504456e9b0cc888201745ae3e0e7282
           ),
         ),
       ),
