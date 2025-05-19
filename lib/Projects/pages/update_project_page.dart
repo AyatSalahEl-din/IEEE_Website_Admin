@@ -49,16 +49,12 @@ class _UpdateProjectPageState extends State<UpdateProjectPage> {
         TextEditingController(),
       ); // Add at least one controller
     }
-    _nameController = TextEditingController(
-      
-    );
-    _descriptionController = TextEditingController(
-      
-    );
+    _nameController = TextEditingController();
+    _descriptionController = TextEditingController();
     _tagsController.text =
         widget.project.tags.isNotEmpty ? widget.project.tags.join(', ') : '';
     _madeByController.text = widget.project.madeBy ?? '';
-   // _selectedDate = widget.project.date ?? DateTime.now();
+    // _selectedDate = widget.project.date ?? DateTime.now();
 
     // Initialize additional details
     int index = 0;
@@ -287,6 +283,29 @@ class _UpdateProjectPageState extends State<UpdateProjectPage> {
               initialDate: _selectedDate,
               firstDate: DateTime(2000),
               lastDate: DateTime(2100),
+              builder: (context, child) {
+                return Theme(
+                  data: Theme.of(context).copyWith(
+                    colorScheme: ColorScheme.light(
+                      primary: WebsiteColors.primaryBlueColor,
+                      onPrimary: Colors.white,
+                      onSurface: WebsiteColors.darkBlueColor,
+                    ),
+                    textButtonTheme: TextButtonThemeData(
+                      style: TextButton.styleFrom(
+                        foregroundColor: WebsiteColors.primaryBlueColor,
+                      ),
+                    ),textTheme: TextTheme(
+                  bodyMedium: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                  ),
+                  child: child!,
+                );
+              },
             );
             if (pickedDate != null) {
               setState(() {

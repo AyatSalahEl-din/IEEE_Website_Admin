@@ -20,12 +20,16 @@ class _BuildDeleteEventWidgetState extends State<BuildDeleteEventWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding:  EdgeInsets.all(8.sp),
-      child: SingleChildScrollView( // Wrap the entire column inside SingleChildScrollView
-        child: Column(
-          children: [
-            // Search Bar
-            Row(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: [
+                // Search Bar
+                Row(
               children: [
                 Expanded(
                   child: TextField(
@@ -203,7 +207,7 @@ class _BuildDeleteEventWidgetState extends State<BuildDeleteEventWidget> {
               ),
             ),
           ],
-        ),
+          )),
       ),
     );
   }

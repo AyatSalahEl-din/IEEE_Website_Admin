@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ieee_website/Projects/models/project_model.dart';
 import 'package:ieee_website/Projects/services/project_service.dart';
 import 'package:ieee_website/Themes/website_colors.dart';
+
+import '../../widgets/datepicker.dart';
 
 class AddProjectPage extends StatefulWidget {
   const AddProjectPage({Key? key}) : super(key: key);
@@ -307,31 +310,13 @@ class _AddProjectPageState extends State<AddProjectPage> {
           ),
         ),
         const SizedBox(height: 8),
-        GestureDetector(
-          onTap: () async {
-            final pickedDate = await showDatePicker(
-              context: context,
-              initialDate: _selectedDate,
-              firstDate: DateTime(2000),
-              lastDate: DateTime(2100),
-            );
-            if (pickedDate != null) {
-              setState(() {
-                _selectedDate = pickedDate;
-              });
-            }
+        CustomDatePicker(
+          initialDate: _selectedDate,
+          onDatePicked: (newDate) {
+            setState(() {
+              _selectedDate = newDate!;
+            });
           },
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade300),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
-              style: const TextStyle(fontSize: 14),
-            ),
-          ),
         ),
       ],
     );
