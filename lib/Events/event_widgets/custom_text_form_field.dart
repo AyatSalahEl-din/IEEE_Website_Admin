@@ -5,6 +5,7 @@ import 'package:ieee_website/Themes/website_colors.dart';
 class CustomTextFormField extends StatelessWidget {
   final TextEditingController controller;
   final String labelText;
+<<<<<<< HEAD
   final IconData? icon;
   final bool isMultiline;
   final bool obscureText;
@@ -21,11 +22,17 @@ class CustomTextFormField extends StatelessWidget {
   final Widget? suffix;
   final bool readOnly;
   final VoidCallback? onTap;
+=======
+  final IconData icon;
+  final bool isMultiline;
+  final FormFieldValidator<String>? validator;
+>>>>>>> 6d52d1a9d504456e9b0cc888201745ae3e0e7282
 
   const CustomTextFormField({
     Key? key,
     required this.controller,
     required this.labelText,
+<<<<<<< HEAD
     this.icon,
     this.isMultiline = false,
     this.obscureText = false,
@@ -42,6 +49,11 @@ class CustomTextFormField extends StatelessWidget {
     this.suffix,
     this.readOnly = false,
     this.onTap,
+=======
+    required this.icon,
+    this.isMultiline = false,
+    this.validator,
+>>>>>>> 6d52d1a9d504456e9b0cc888201745ae3e0e7282
   }) : super(key: key);
 
   @override
@@ -49,6 +61,7 @@ class CustomTextFormField extends StatelessWidget {
     return TextFormField(
       controller: controller,
       validator: validator,
+<<<<<<< HEAD
       maxLines: isMultiline ? (maxLines ?? null) : (obscureText ? 1 : (maxLines ?? 1)),
       minLines: isMultiline ? (minLines ?? 3) : null,
       obscureText: obscureText,
@@ -120,3 +133,27 @@ class CustomTextFormField extends StatelessWidget {
     );
   }
 }
+=======
+      maxLines: isMultiline ? null : 1, // allows multiline if needed
+      decoration: InputDecoration(
+        labelText: labelText,
+        labelStyle: TextStyle(
+          color: WebsiteColors.primaryBlueColor,
+          fontWeight: FontWeight.bold,
+          fontSize: 25.sp,
+        ),
+        prefixIcon: Icon(icon, color: WebsiteColors.primaryBlueColor), // Custom icon color
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.sp),
+          borderSide: BorderSide(color: WebsiteColors.primaryBlueColor, width: 2.0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.sp),
+          borderSide: BorderSide(color: WebsiteColors.primaryBlueColor, width: 2.0),
+        ),
+      ),
+      style: TextStyle(fontSize: 31.sp),
+    );
+  }
+}
+>>>>>>> 6d52d1a9d504456e9b0cc888201745ae3e0e7282

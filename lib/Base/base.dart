@@ -5,6 +5,8 @@ import 'package:ieee_website/Contact_us/contact.dart';
 import 'package:ieee_website/Events/events.dart';
 import 'package:ieee_website/FAQ/faq.dart';
 import 'package:ieee_website/Home_screen/home_screen.dart';
+import 'package:ieee_website/Home_screen/members/models/url_helper.dart';
+import 'package:ieee_website/Join_us/join.dart';
 import 'package:ieee_website/Projects/projects_page.dart';
 import 'package:ieee_website/Themes/website_colors.dart';
 
@@ -88,8 +90,10 @@ class _BaseState extends State<Base> with SingleTickerProviderStateMixin {
         children: [
           HomeScreen(tabController: _tabController),
           AboutUs(tabController: _tabController),
-          Events(tabController: _tabController),
-          Projects(tabController: _tabController),
+          AdminEventPage(tabController: _tabController),
+          Projects(
+            tabController: _tabController,
+          ), // Pass TabController to Projects
           Contact(tabController: _tabController),
           FAQ(tabController: _tabController),
         ],

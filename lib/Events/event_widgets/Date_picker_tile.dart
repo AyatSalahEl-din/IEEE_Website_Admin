@@ -17,6 +17,7 @@ class CustomDatePicker extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       title: Text(
         initialDate != null ? DateFormat.yMMMd().format(initialDate!) : "Pick a date",
+<<<<<<< HEAD
         style:  TextStyle(fontSize: 30.sp,color: WebsiteColors.primaryBlueColor),
       ),
       trailing: const Icon(Icons.calendar_month_outlined, color: WebsiteColors.primaryBlueColor),
@@ -45,6 +46,48 @@ class CustomDatePicker extends StatelessWidget {
             textStyleDayOnCalendarSelected: TextStyle(fontSize: 35.sp, color: Colors.white, fontWeight: FontWeight.bold),
             textStyleDayOnCalendarDisabled: TextStyle(fontSize: 28.sp, color: Colors.white.withOpacity(0.1)),
             sizeArrow: 30.sp,
+=======
+        style: TextStyle(fontSize: 22.sp, color: WebsiteColors.primaryBlueColor), // Smaller for safety
+        overflow: TextOverflow.ellipsis,
+      ),
+      trailing: const Icon(Icons.calendar_month_outlined, color: WebsiteColors.primaryBlueColor),
+      onTap: () async {
+        final screenHeight = MediaQuery.of(context).size.height;
+
+        DateTime? newDateTime = await showRoundedDatePicker(
+          context: context,
+          customWeekDays: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
+          theme: ThemeData(
+            buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
+            hintColor: WebsiteColors.darkBlueColor,
+            primaryColor: WebsiteColors.darkBlueColor,
+            textTheme: const TextTheme(
+              bodyMedium: TextStyle(color: WebsiteColors.darkBlueColor),
+            ),
+            colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue).copyWith(
+              background: Colors.white,
+            ),
+          ),
+          imageHeader: const AssetImage("assets/images/IEEE.jpg"),
+          lastDate: DateTime(2100),
+          firstDate: DateTime(2000),
+          borderRadius: 16.0.sp,
+          height: screenHeight * 0.6, // 🛠 Dynamically adjust height to fit the screen
+          styleDatePicker: MaterialRoundedDatePickerStyle(
+            textStyleDayButton: TextStyle(fontSize: 24.sp, color: WebsiteColors.whiteColor),
+            textStyleYearButton: TextStyle(fontSize: 32.sp, color: WebsiteColors.whiteColor),
+            textStyleDayOnCalendar: TextStyle(fontSize: 22.sp, color: Colors.black),
+            textStyleDayOnCalendarSelected: TextStyle(
+              fontSize: 24.sp,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+            textStyleDayOnCalendarDisabled: TextStyle(
+              fontSize: 20.sp,
+              color: Colors.white.withOpacity(0.1),
+            ),
+            sizeArrow: 22.sp,
+>>>>>>> 6d52d1a9d504456e9b0cc888201745ae3e0e7282
             colorArrowNext: Colors.black,
             colorArrowPrevious: Colors.black,
             marginLeftArrowPrevious: 16.sp,
@@ -54,7 +97,10 @@ class CustomDatePicker extends StatelessWidget {
           ),
         );
 
+<<<<<<< HEAD
         // If a new date is selected, update the state
+=======
+>>>>>>> 6d52d1a9d504456e9b0cc888201745ae3e0e7282
         if (newDateTime != null) {
           onDatePicked(newDateTime);
         }
