@@ -1,29 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ieee_website/Themes/website_colors.dart';
-
 import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'event_widgets/add_event_admin.dart';
+import 'event_widgets/add_event_admin.dart'; // Ensure this imports the addEvent function
 import 'event_widgets/build_add_event_widget.dart';
 import 'event_widgets/build_delete_event_widget.dart';
 import 'event_widgets/build_edit_event_widget.dart';
 import 'event_widgets/custom_elevated_button.dart';
-import 'event_widgets/custom_text_form_field.dart';
-import 'event_widgets/edit_event_admin.dart';
+import 'package:ieee_website/Events/managereq.dart';
+import 'package:ieee_website/Events/proposals.dart'; // Import the proposals widget
+//import 'package:cloud_firestore/cloud_firestore.dart'as firestore; // Alias added
 
-class AdminEventPage extends StatefulWidget {
-
+class Events extends StatefulWidget {
   static const String routeName = 'admin';
-  final TabController? tabController; // ✅ Make TabController optional
+  final TabController? tabController;
 
-  AdminEventPage({super.key, this.tabController});
+  Events({super.key, this.tabController});
 
   @override
-  State<AdminEventPage> createState() => _AdminEventPageState();
+  State<Events> createState() => _EventsState();
 }
 
-class _AdminEventPageState extends State<AdminEventPage> {
+class _EventsState extends State<Events> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _categoryController = TextEditingController();
@@ -35,7 +33,7 @@ class _AdminEventPageState extends State<AdminEventPage> {
   DateTime? _selectedDate;
   List<String> _imageUrls = [];
   bool _isLoading = false;
-  String? _editingEventId;
+  //String? _editingEventId;
 
   String get _selectedMonth =>
       _selectedDate != null ? DateFormat.MMMM().format(_selectedDate!) : '';
@@ -65,7 +63,7 @@ class _AdminEventPageState extends State<AdminEventPage> {
       _imageUrls.clear();
       _selectedDate = null;
       _isLoading = false;
-      _editingEventId = null;
+      //_editingEventId = null;
       _nameController.clear();
       _categoryController.clear();
       _descriptionController.clear();
@@ -74,12 +72,12 @@ class _AdminEventPageState extends State<AdminEventPage> {
     });
   }
 
-  Future<void> _loadEventData(String eventId) async {
+  /*Future<void> _loadEventData(String eventId) async {
     final doc =
-    await FirebaseFirestore.instance
-        .collection('events')
-        .doc(eventId)
-        .get();
+        await firestore.FirebaseFirestore.instance
+            .collection('events')
+            .doc(eventId)
+            .get();
     final data = doc.data();
     if (data != null) {
       setState(() {
@@ -91,18 +89,21 @@ class _AdminEventPageState extends State<AdminEventPage> {
         _timeController.text = data['time'] ?? '';
         _imageUrls = List<String>.from(data['imageUrls'] ?? []);
         _selectedDate =
-        (data['date'] is Timestamp)
-            ? (data['date'] as Timestamp).toDate()
-            : data['date'].dateTime().now();
+            data['date'] != null
+                ? (data['date'] as firestore.Timestamp).toDate()
+                : null;
       });
     }
-  }
+  }*/
 
-  Future<void> _deleteEvent(String eventId) async {
-    await FirebaseFirestore.instance.collection('events').doc(eventId).delete();
-  }
+  /*Future<void> _deleteEvent(String eventId) async {
+    await firestore.FirebaseFirestore.instance
+        .collection('events')
+        .doc(eventId)
+        .delete();
+  }*/
 
-  @override
+ @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -114,13 +115,14 @@ class _AdminEventPageState extends State<AdminEventPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Tab buttons to switch between Add, Edit, and Delete
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Button Row - Wrap with SingleChildScrollView for horizontal scrolling if needed
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   CustomElevatedButton(
                     label: 'Add Event',
@@ -136,15 +138,31 @@ class _AdminEventPageState extends State<AdminEventPage> {
                     label: 'Delete Event',
                     onPressed: () => setState(() => _selectedIndex = 2),
                   ),
+                  SizedBox(width: 10.sp),
+                  CustomElevatedButton(
+                    label: 'Manage Requests',
+                    onPressed: () => setState(() => _selectedIndex = 3),
+                  ),
+                  SizedBox(width: 10.sp),
+                  CustomElevatedButton(
+                    label: 'Proposals',
+                    onPressed: () => setState(() => _selectedIndex = 4),
+                  ),
                 ],
               ),
-              const SizedBox(height: 20),
+            ),
+            const SizedBox(height: 20),
 
-              // Show content based on the selected tab
-              if (_selectedIndex == 0)
-                AddEventForm(
-                  formKey: _formKey,
-                  nameController: _nameController,
+            // Main Content Area - Use Expanded to ensure proper sizing
+            Expanded(
+              child: IndexedStack(
+                index: _selectedIndex,
+                children: [
+                  // Index 0: Add Event
+                  SingleChildScrollView(
+                    child: AddEventForm(
+                      formKey: _formKey,
+                      nameController: _nameController,
                   categoryController: _categoryController,
                   descriptionController: _descriptionController,
                   locationController: _locationController,
@@ -157,18 +175,51 @@ class _AdminEventPageState extends State<AdminEventPage> {
                   setLoading: _setLoading,
                   resetForm: _resetForm,
                   pickDate: _pickDate,
-                  addEvent: addEvent,
-                ),
-              if (_selectedIndex == 1) EditEventWidget( ),
-              if (_selectedIndex == 2) BuildDeleteEventWidget(),
-            ],
-          ),
+                  addEvent: addEvent, 
+                  ticketPriceController: TextEditingController(),
+                  discountController: TextEditingController(),
+                  discountForController: TextEditingController(),
+                  busTicketPriceController: TextEditingController(),
+                  busSeatsController: TextEditingController(),
+                  busSourceController: TextEditingController(),
+                  busDestinationController: TextEditingController(),
+                  tripExplanationController: TextEditingController(),
+                  contactNumberController: TextEditingController(),
+                  contactEmailController: TextEditingController(),
+                  isTicketAvailable: false,
+                  isTicketLimited: false,
+                  ticketLimit: null,
+                  numberOfBuses: null,
+                  seatsPerBus: null,
+                  isSeatBookingAvailable: false,
+                  busDepartureTimeController: TextEditingController(),
+                  busArrivalTimeController: TextEditingController(),
+                  appNameController: TextEditingController(), // Added
+                  appTimeController: TextEditingController(), // Added
+                  appUrlController: TextEditingController(), // Added
+                  isOnlineEvent: false, // Added
+                  selectedApp: null, // Added
+                ),),
+                  EditEventWidget(),
+                  
+                  // Index 2: Delete Event
+                  BuildDeleteEventWidget(),
+                  
+                  // Index 3: Manage Requests - Key fix is here
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      return ManageRequestsWidget();
+                    },
+                  ),
+                  
+                  // Index 4: Proposals
+                  ManageProposalsWidget(),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
-
-
-
-
 }

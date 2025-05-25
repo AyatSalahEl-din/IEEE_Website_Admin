@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ieee_website/Themes/website_colors.dart';
 import 'package:intl/intl.dart';
-import 'edit_event_admin.dart';
 import 'events_card.dart';
 
 
@@ -21,12 +20,16 @@ class _BuildDeleteEventWidgetState extends State<BuildDeleteEventWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding:  EdgeInsets.all(8.sp),
-      child: SingleChildScrollView( // Wrap the entire column inside SingleChildScrollView
-        child: Column(
-          children: [
-            // Search Bar
-            Row(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: [
+                // Search Bar
+                Row(
               children: [
                 Expanded(
                   child: TextField(
@@ -204,7 +207,7 @@ class _BuildDeleteEventWidgetState extends State<BuildDeleteEventWidget> {
               ),
             ),
           ],
-        ),
+          )),
       ),
     );
   }

@@ -12,5 +12,9 @@ class WebsiteColors {
   static const Color blackColor = Color(0xff000000);
   static const Color primaryYellowColor = Color(0xffF6A31B);
   static const Color gradeintBlueColor = Color(0xffE2F1FB);
-  static const Color redColor = Colors.red;
+  
+  static const Color redColor = Color.fromARGB(255, 206, 106, 106);
+
+  static const Color successGreenColor = Color(0xFF4CAF50);
+
 }

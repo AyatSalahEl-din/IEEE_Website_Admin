@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
             SignUpScreen.routeName: (context) => SignUpScreen(),
             HomeScreen.routeName: (context) => HomeScreen(),
             AboutUs.routeName: (context) => AboutUs(),
-            AdminEventPage.routeName: (context) => AdminEventPage(),
+            Events.routeName: (context) => Events(),
             Projects.routeName: (context) => Projects(),
             Contact.routeName: (context) => Contact(),
             Base.routeName: (context) => Base(),

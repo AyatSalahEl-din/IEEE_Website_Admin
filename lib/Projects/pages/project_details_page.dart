@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ieee_website/Projects/models/project_model.dart';
 import 'package:ieee_website/Projects/services/project_service.dart';
 import 'package:ieee_website/Themes/website_colors.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../pages/update_project_page.dart';
 
 class ProjectDetailsPage extends StatefulWidget {
@@ -33,7 +34,9 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
     });
 
     try {
-      final project = await _projectService.getProjectById(widget.projectId);
+      final project = await _projectService.getProjectById(
+        widget.projectId,
+      ); // Fetch by ID
       setState(() {
         _project = project;
         _isLoading = false;
@@ -60,7 +63,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
               ), // Primary blue text
             ),
             content: Text(
-              'Are you sure you want to delete "${_project?.name}"? This action cannot be undone.',
+              'Are you sure you want to delete "${_project?.title}"? This action cannot be undone.',
               style: const TextStyle(
                 color: WebsiteColors.primaryBlueColor,
               ), // Primary blue text
@@ -109,6 +112,113 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
         }
       }
     }
+  }
+
+  Widget _buildProjectImage() {
+    final List<String>? firebaseImages = _project?.imageUrls;
+    String? firstImage;
+
+    if (firebaseImages != null && firebaseImages.isNotEmpty) {
+      firstImage = firebaseImages.firstWhere(
+        (url) => url.isNotEmpty && url.startsWith('http'),
+        orElse:
+            () => '', // Fallback to an empty string if no valid URL is found
+      );
+    }
+
+    return firstImage != null && firstImage.isNotEmpty
+        ? Image.network(
+          firstImage,
+          width: double.infinity,
+          height: 300,
+          fit: BoxFit.fill,
+          errorBuilder:
+              (context, error, stackTrace) => const Icon(
+                Icons.broken_image,
+                size: 50,
+                color: WebsiteColors.primaryBlueColor,
+              ),
+        )
+        : Container(
+          width: double.infinity,
+          height: 300,
+          color: WebsiteColors.gradeintBlueColor,
+          child: const Icon(
+            Icons.broken_image,
+            size: 50,
+            color: WebsiteColors.primaryBlueColor,
+          ),
+        );
+  }
+
+  Widget _buildImageUrlsSection() {
+    if (_project?.imageUrls == null || _project!.imageUrls!.isEmpty) {
+      return const SizedBox.shrink(); // Return an empty widget if no URLs exist
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 24),
+        const Text(
+          'Image URLs',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: WebsiteColors.darkBlueColor,
+          ),
+        ),
+        const SizedBox(height: 12),
+        ..._project!.imageUrls!.map((url) {
+          return Container(
+            margin: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            decoration: BoxDecoration(
+              color: WebsiteColors.whiteColor,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.grey.shade300),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.shade100,
+                  offset: const Offset(0, 2),
+                  blurRadius: 4,
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    url,
+                    style: const TextStyle(color: WebsiteColors.darkGreyColor),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.open_in_browser,
+                    color: WebsiteColors.primaryBlueColor,
+                  ),
+                  onPressed: () async {
+                    if (await canLaunch(url)) {
+                      await launch(url);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Could not launch URL'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      ],
+    );
   }
 
   @override
@@ -161,7 +271,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          _project!.name,
+          _project!.title,
           style: const TextStyle(color: WebsiteColors.whiteColor),
         ),
         backgroundColor: WebsiteColors.primaryBlueColor,
@@ -193,30 +303,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Project image
-            _project!.imageUrl!.isNotEmpty
-                ? Container(
-                  width: double.infinity,
-                  height: 300,
-                  decoration: BoxDecoration(
-                    color: WebsiteColors.gradeintBlueColor,
-                    image: DecorationImage(
-                      image: NetworkImage(
-                        '${_project!.imageUrl}=w400',
-                      ), // Append "=w400"
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                )
-                : Container(
-                  width: double.infinity,
-                  height: 300,
-                  color: WebsiteColors.gradeintBlueColor,
-                  child: const Icon(
-                    Icons.image,
-                    size: 100,
-                    color: WebsiteColors.primaryBlueColor,
-                  ),
-                ),
+            _buildProjectImage(),
 
             // Project details
             Padding(
@@ -226,7 +313,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                 children: [
                   // Project name
                   Text(
-                    _project!.name,
+                    _project!.title,
                     style: const TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -235,23 +322,40 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                   ),
                   const SizedBox(height: 12),
 
+                  // Made by
+                  Text(
+                    _project!.madeBy ?? 'Made by: N/A',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: WebsiteColors.greyColor,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
                   // Creation date
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.calendar_today,
-                        size: 18,
-                        color: WebsiteColors.greyColor,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Created on: ${_project!.createdAt.day}/${_project!.createdAt.month}/${_project!.createdAt.year}',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: WebsiteColors.greyColor,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    'Date: ${_project!.date.day}/${_project!.date.month}/${_project!.date.year}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: WebsiteColors.greyColor,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Tags
+                  Wrap(
+                    spacing: 4,
+                    children:
+                        _project!.tags.map((tag) {
+                          return Chip(
+                            label: Text(tag),
+                            backgroundColor: WebsiteColors.gradeintBlueColor,
+                            labelStyle: const TextStyle(
+                              color: WebsiteColors.primaryBlueColor,
+                              fontSize: 12,
+                            ),
+                          );
+                        }).toList(),
                   ),
                   const SizedBox(height: 24),
 
@@ -287,7 +391,8 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                   const SizedBox(height: 24),
 
                   // Additional details section
-                  if (_project!.additionalDetails.isNotEmpty) ...[
+                  if (_project!.additionalDetails != null &&
+                      _project!.additionalDetails!.isNotEmpty) ...[
                     const Text(
                       'Additional Details',
                       style: TextStyle(
@@ -297,9 +402,51 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    ...buildAdditionalDetails(),
-                    const SizedBox(height: 24),
+                    ..._project!.additionalDetails!.entries.map((entry) {
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 16,
+                        ),
+                        decoration: BoxDecoration(
+                          color: WebsiteColors.whiteColor,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.grey.shade300),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.shade100,
+                              offset: const Offset(0, 2),
+                              blurRadius: 4,
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Text(
+                              '${entry.key}:',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: WebsiteColors.darkBlueColor,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                '${entry.value}',
+                                style: const TextStyle(
+                                  color: WebsiteColors.darkGreyColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
                   ],
+
+                  // Image URLs Section
+                  _buildImageUrlsSection(), // Add the image URLs section
                 ],
               ),
             ),
@@ -309,8 +456,8 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
     );
   }
 
-  List<Widget> buildAdditionalDetails() {
-    return _project!.additionalDetails.entries.map((entry) {
+  List<Container>? buildAdditionalDetails() {
+    return _project!.additionalDetails?.entries.map((entry) {
       return Container(
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ieee_website/Projects/components/project_card.dart';
 import 'package:ieee_website/Projects/models/project_model.dart';
-import 'package:ieee_website/Projects/pages/add_project_page.dart';
+import 'package:ieee_website/Projects/pages/add_project_page.dart'
+    as add_project;
 import 'package:ieee_website/Projects/pages/project_details_page.dart';
 import 'package:ieee_website/Projects/pages/update_project_page.dart';
 import 'package:ieee_website/Projects/services/project_service.dart';
@@ -9,8 +10,7 @@ import 'package:ieee_website/Themes/website_colors.dart';
 
 class Projects extends StatefulWidget {
   static const String routeName = 'projects';
-  final TabController?
-  tabController; // This is the parent controller from Base widget (length 6)
+  final TabController? tabController;
 
   const Projects({super.key, this.tabController});
 
@@ -63,7 +63,7 @@ class _ProjectsState extends State<Projects>
               controller: _projectTabController,
               children: [
                 _buildProjectsGrid(), // All Projects tab
-                AddProjectPage(), // Add Project tab
+                add_project.AddProjectPage(), // Add Project tab
                 _buildManageProjectsTab(), // Manage Projects tab
               ],
             ),
@@ -87,7 +87,9 @@ class _ProjectsState extends State<Projects>
               _projectTabController.index == index
                   ? WebsiteColors.primaryBlueColor
                   : Colors.grey[300],
-          borderRadius: BorderRadius.circular(25.0),
+          borderRadius: BorderRadius.circular(
+            25.0,
+          ), // Use Flutter's BorderRadius
         ),
         child: Text(
           text,
@@ -117,18 +119,11 @@ class _ProjectsState extends State<Projects>
         }
 
         if (snapshot.hasError) {
-          debugPrint('Error in StreamBuilder: ${snapshot.error}'); // Debug log
-          return Center(
-            child: Text(
-              'Error loading projects: ${snapshot.error}',
-              style: const TextStyle(color: Colors.red),
-            ),
-          );
+          return Center(child: Text('Error: ${snapshot.error}'));
         }
 
         final projects = snapshot.data ?? [];
         if (projects.isEmpty) {
-          debugPrint('No projects found'); // Debug log
           return const Center(
             child: Text(
               'No projects yet. Add your first project!',
@@ -137,15 +132,14 @@ class _ProjectsState extends State<Projects>
           );
         }
 
-        // Responsive grid layout to prevent overflow
         return Padding(
           padding: const EdgeInsets.all(16.0),
           child: GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: _calculateCrossAxisCount(context),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3, 
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
-              childAspectRatio: 0.9, // Adjusted for smaller card proportions
+              childAspectRatio: 1, 
             ),
             itemCount: projects.length,
             itemBuilder: (context, index) {
@@ -168,18 +162,6 @@ class _ProjectsState extends State<Projects>
         );
       },
     );
-  }
-
-  // Helper method to make grid responsive
-  int _calculateCrossAxisCount(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    if (width > 1200) {
-      return 3;
-    } else if (width > 800) {
-      return 2;
-    } else {
-      return 1;
-    }
   }
 
   Widget _buildManageProjectsTab() {
@@ -220,33 +202,30 @@ class _ProjectsState extends State<Projects>
               child: ListTile(
                 contentPadding: const EdgeInsets.all(16.0),
                 leading:
-                    project.imageUrl!.isNotEmpty
+                    project.imageUrls != null && project.imageUrls!.isNotEmpty
                         ? ClipRRect(
                           borderRadius: BorderRadius.circular(8.0),
                           child: Image.network(
-                            project.imageUrl ?? '',
-                            width: 60,
-                            height: 60,
+                            project.imageUrls!.first, // Use the first image URL
+                            width: 80, // Adjusted width for better presentation
+                            height:
+                                80, // Adjusted height for better presentation
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return Container(
-                                width: 60,
-                                height: 60,
-                                color:
-                                    WebsiteColors
-                                        .whiteColor, // Set container background to white
+                                width: 80,
+                                height: 80,
+                                color: WebsiteColors.whiteColor,
                                 child: const Icon(Icons.image_not_supported),
                               );
                             },
                           ),
                         )
                         : Container(
-                          width: 60,
-                          height: 60,
+                          width: 80, // Adjusted width for better presentation
+                          height: 80, // Adjusted height for better presentation
                           decoration: BoxDecoration(
-                            color:
-                                WebsiteColors
-                                    .whiteColor, // Set container background to white
+                            color: WebsiteColors.whiteColor,
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           child: const Icon(
@@ -255,18 +234,57 @@ class _ProjectsState extends State<Projects>
                           ),
                         ),
                 title: Text(
-                  project.name,
+                  project.title,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                     color: WebsiteColors.darkBlueColor,
                   ),
                 ),
-                subtitle: Text(
-                  project.description,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: WebsiteColors.descGreyColor),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      project.madeBy != null
+                          ? 'Made by: ${project.madeBy}'
+                          : 'Made by: N/A',
+                      style: const TextStyle(
+                        color: WebsiteColors.descGreyColor,
+                      ),
+                    ),
+                    Text(
+                      // ignore: unnecessary_null_comparison
+                      project.date != null
+                          ? 'Date: ${project.date.day}/${project.date.month}/${project.date.year}'
+                          : 'Date: N/A',
+                      style: const TextStyle(
+                        color: WebsiteColors.descGreyColor,
+                      ),
+                    ),
+                    Text(
+                      project.imageUrls != null && project.imageUrls!.isNotEmpty
+                          ? 'Image URL: ${project.imageUrls!.first}'
+                          : 'Image URL: N/A',
+                      style: const TextStyle(
+                        color: WebsiteColors.descGreyColor,
+                        fontSize: 12,
+                      ),
+                    ),
+                    Wrap(
+                      spacing: 4,
+                      children:
+                          project.tags.map((tag) {
+                            return Chip(
+                              label: Text(tag),
+                              backgroundColor: WebsiteColors.gradeintBlueColor,
+                              labelStyle: const TextStyle(
+                                color: WebsiteColors.primaryBlueColor,
+                                fontSize: 12,
+                              ),
+                            );
+                          }).toList(),
+                    ),
+                  ],
                 ),
                 trailing: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 100),
@@ -332,7 +350,7 @@ class _ProjectsState extends State<Projects>
             ), // Primary blue text
           ),
           content: Text(
-            'Are you sure you want to delete "${project.name}"?',
+            'Are you sure you want to delete "${project.title}"?',
             style: const TextStyle(
               color: WebsiteColors.primaryBlueColor,
             ), // Primary blue text
