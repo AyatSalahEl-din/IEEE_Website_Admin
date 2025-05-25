@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ieee_website/Themes/website_colors.dart';
 
 class LinksScreen extends StatefulWidget {
   @override
@@ -68,7 +69,14 @@ class _LinksScreenState extends State<LinksScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Edit Join Us Link")),
+      appBar: AppBar(
+        title: Text(
+          "Edit Join Us Link",
+          style: Theme.of(context).textTheme.displaySmall?.copyWith(
+            color: WebsiteColors.primaryBlueColor,
+          ),
+        ),
+      ),
       body:
           _isLoading
               ? Center(child: CircularProgressIndicator())
@@ -79,7 +87,9 @@ class _LinksScreenState extends State<LinksScreen> {
                   children: [
                     Text(
                       "Current Join Us Link:",
-                      style: TextStyle(fontSize: 16),
+                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                        color: WebsiteColors.primaryBlueColor,
+                      ),
                     ),
                     SizedBox(height: 10),
                     TextField(
@@ -87,12 +97,18 @@ class _LinksScreenState extends State<LinksScreen> {
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: "Join Us URL",
+                        labelStyle: Theme.of(context).textTheme.displaySmall
+                            ?.copyWith(color: WebsiteColors.primaryBlueColor),
                       ),
                     ),
                     SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: updateLink,
-                      child: Text("Update Link"),
+                      child: Text(
+                        "Update Link",
+                        style: Theme.of(context).textTheme.displaySmall
+                            ?.copyWith(color: WebsiteColors.primaryBlueColor),
+                      ),
                     ),
                   ],
                 ),

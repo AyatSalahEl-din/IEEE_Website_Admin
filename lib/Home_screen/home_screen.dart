@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:ieee_website/Home_screen/account/account.dart';
+import 'package:ieee_website/Home_screen/admins/admins.dart';
 import 'package:ieee_website/Home_screen/links/links_screen.dart';
 import 'package:ieee_website/Home_screen/members/member_admin_screen.dart';
 import 'package:ieee_website/Home_screen/members/widgets/home_action_card.dart';
@@ -24,29 +26,60 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Center(
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 40.h, horizontal: 16.w),
-          child: Row(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              HomeActionCard(
-                icon: Icons.group,
-                title: 'Manage Team\nMembers',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => MemberAdminScreen()),
-                  );
-                },
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  HomeActionCard(
+                    icon: Icons.group,
+                    title: 'Manage Team\nMembers',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => MemberAdminScreen()),
+                      );
+                    },
+                  ),
+                  SizedBox(width: 24.w),
+                  HomeActionCard(
+                    icon: Icons.handshake,
+                    title: 'Manage Join\nUs Link',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => LinksScreen()),
+                      );
+                    },
+                  ),
+                ],
               ),
-              SizedBox(width: 24.w),
-              HomeActionCard(
-                icon: Icons.handshake,
-                title: 'Manage Join\nUs Link',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => LinksScreen()),
-                  );
-                },
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  HomeActionCard(
+                    icon: Icons.admin_panel_settings,
+                    title: 'New Admins',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => Admins()),
+                      );
+                    },
+                  ),
+                  SizedBox(width: 24.w),
+                  HomeActionCard(
+                    icon: Icons.lock,
+                    title: 'Manage Your Account',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => Account()),
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),

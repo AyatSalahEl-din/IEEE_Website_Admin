@@ -6,7 +6,6 @@ import 'package:ieee_website/Events/events.dart';
 import 'package:ieee_website/FAQ/faq.dart';
 import 'package:ieee_website/Home_screen/home_screen.dart';
 import 'package:ieee_website/Home_screen/members/models/url_helper.dart';
-import 'package:ieee_website/Join_us/join.dart';
 import 'package:ieee_website/Projects/projects_page.dart';
 import 'package:ieee_website/Themes/website_colors.dart';
 

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -5,8 +6,13 @@ import 'package:ieee_website/Base/base.dart';
 import 'package:ieee_website/Home_screen/home_screen.dart';
 import 'package:ieee_website/Login/auth/custom_text_form_field.dart';
 import 'package:ieee_website/Login/auth/dialog_utils.dart';
-import 'package:ieee_website/Login/auth/footer_contact_widget.dart';
+import 'package:ieee_website/Login/signup/sign.dart';
 import 'package:ieee_website/Themes/website_colors.dart';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
+import 'package:ieee_website/utils/shared_prefs_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String routeName = 'login_screen';
@@ -56,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Padding(
                 padding: EdgeInsets.all(24.w),
                 child: SizedBox(
-                  height: 2900.h,
+                  height: 3100.h,
                   width: 900.w,
                   child: Form(
                     key: formKey,
@@ -144,34 +150,76 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         SizedBox(height: 100.h),
 
-                        Text(
-                          'New Chairman? Please contact',
-                          style: Theme.of(
-                            context,
-                          ).textTheme.titleMedium?.copyWith(
-                            color: WebsiteColors.primaryBlueColor,
-                            fontSize: 24.sp,
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: WebsiteColors.whiteColor,
                           ),
-                        ),
-
-                        TextButton(
                           onPressed: () {
-                            // Forgot password logic here
+                            Navigator.pushNamed(
+                              context,
+                              SignUpScreen.routeName,
+                            );
                           },
+
                           child: Text(
-                            'IEEE PUA Website Support Team',
+                            'Request an Access',
                             style: Theme.of(
                               context,
                             ).textTheme.titleMedium?.copyWith(
                               color: WebsiteColors.primaryBlueColor,
-                              fontSize: 25.sp,
+                              fontSize: 30.sp,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
-                        FooterContactWidget(
-                          whatsappNumber: '+201278726607',
-                          email: 'ayat.salah.eldin@gmail.com',
+                        SizedBox(height: 150.h),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Forget Password? Please contact',
+                              style: Theme.of(
+                                context,
+                              ).textTheme.titleMedium?.copyWith(
+                                color: WebsiteColors.primaryBlueColor,
+                                fontSize: 25.sp,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                final Uri emailLaunchUri = Uri(
+                                  scheme: 'mailto',
+                                  path:
+                                      'ayat.salah.eldin@gmail.com', // Change to full valid email
+                                  query: Uri.encodeFull(
+                                    'subject=IEEE Support&body=Hello Ayat, I need help with getting my password back , my email is ...',
+                                  ),
+                                );
+
+                                if (await canLaunchUrl(emailLaunchUri)) {
+                                  await launchUrl(emailLaunchUri);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        "Could not open email app.",
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                              child: Text(
+                                'IEEE Support Team',
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.titleMedium?.copyWith(
+                                  color: WebsiteColors.primaryBlueColor,
+                                  fontSize: 26.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -186,52 +234,70 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void login() async {
-    //show loading
-    DialogUtils.showLoading(context: context, loadingLabel: 'Loading..');
+    final email = nameController.text.trim();
+    final password = passController.text;
+
+    DialogUtils.showLoading(context: context, loadingLabel: 'Loading...');
+
     try {
-      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: nameController.text,
-        password: passController.text,
-      );
-      //hide loading
-      DialogUtils.hideLoading(context);
-      //show message
-      DialogUtils.showMessage(
-        context: context,
-        content: "Login Succefully",
-        posActionName: "OK",
-        posAction: () {
-          Navigator.of(context).pushReplacementNamed(Base.routeName);
-        },
-      );
-      print("Login Succefully");
-      print(credential.user?.uid ?? "");
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'invalid-credential') {
-        //hide loading
+      final doc =
+          await FirebaseFirestore.instance
+              .collection('adminUsers')
+              .doc(email)
+              .get();
+
+      if (!doc.exists) {
         DialogUtils.hideLoading(context);
-        //show message invalid
         DialogUtils.showMessage(
           context: context,
           content: "Email is not Authorized!",
           posActionName: "Try Again",
         );
-        print('No user found for that email.');
-      } else if (e.code == 'wrong-password') {
-        //hide loading
+        return;
+      }
+
+      final storedPassword = doc.data()?['password'];
+
+      if (storedPassword == null || storedPassword.isEmpty) {
         DialogUtils.hideLoading(context);
-        //show message invalid
+        DialogUtils.showMessage(
+          context: context,
+          content: "No password found for this account!",
+          posActionName: "Try Again",
+        );
+        return;
+      }
+
+      if (storedPassword != password) {
+        DialogUtils.hideLoading(context);
         DialogUtils.showMessage(
           context: context,
           content: "Incorrect Password!",
           posActionName: "Try Again",
         );
-        print('Wrong password provided for that user.');
+        return;
       }
+
+      // Save email to SharedPreferences
+      await SharedPrefsHelper.saveLoggedInEmail(email);
+
+      DialogUtils.hideLoading(context);
+      DialogUtils.showMessage(
+        context: context,
+        content: "Login Successfully",
+        posActionName: "OK",
+        posAction: () {
+          Navigator.of(context).pushReplacementNamed(Base.routeName);
+        },
+      );
     } catch (e) {
-      //hide loading
-      //show message invalid
-      print(e.toString());
+      DialogUtils.hideLoading(context);
+      print('Login error: $e');
+      DialogUtils.showMessage(
+        context: context,
+        content: "An error occurred. Please try again.",
+        posActionName: "OK",
+      );
     }
   }
 }

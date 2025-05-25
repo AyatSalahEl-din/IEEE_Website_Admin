@@ -7,12 +7,10 @@ import 'package:ieee_website/Contact_us/contact.dart';
 import 'package:ieee_website/Events/events.dart';
 import 'package:ieee_website/FAQ/faq.dart';
 import 'package:ieee_website/Home_screen/home_screen.dart';
-import 'package:ieee_website/Join_us/join.dart';
 import 'package:ieee_website/Login/login.dart';
-
+import 'package:ieee_website/Login/signup/sign.dart';
 import 'package:ieee_website/Projects/projects_page.dart';
 import 'package:ieee_website/Themes/my_theme.dart';
-
 import 'utils/firebase_options.dart';
 
 void main() async {
@@ -45,12 +43,12 @@ class MyApp extends StatelessWidget {
           initialRoute: LoginScreen.routeName,
           routes: {
             LoginScreen.routeName: (context) => LoginScreen(),
+            SignUpScreen.routeName: (context) => SignUpScreen(),
             HomeScreen.routeName: (context) => HomeScreen(),
             AboutUs.routeName: (context) => AboutUs(),
             AdminEventPage.routeName: (context) => AdminEventPage(),
             Projects.routeName: (context) => Projects(),
             Contact.routeName: (context) => Contact(),
-            JoinUs.routeName: (context) => JoinUs(),
             Base.routeName: (context) => Base(),
             FAQ.routeName: (context) => FAQ(),
           },

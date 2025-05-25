@@ -151,7 +151,12 @@ class _MemberAdminScreenState extends State<MemberAdminScreen> {
                   SizedBox(width: 10),
                   ElevatedButton(
                     onPressed: _updateRowCount,
-                    child: Text("Set Rows"),
+                    child: Text(
+                      "Set Rows",
+                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                        color: WebsiteColors.primaryBlueColor,
+                      ),
+                    ),
                   ),
                 ],
               ),
