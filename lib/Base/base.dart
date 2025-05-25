@@ -5,13 +5,6 @@ import 'package:ieee_website/Contact_us/contact.dart';
 import 'package:ieee_website/Events/events.dart';
 import 'package:ieee_website/FAQ/faq.dart';
 import 'package:ieee_website/Home_screen/home_screen.dart';
-import 'package:ieee_website/Home_screen/members/models/url_helper.dart';
-<<<<<<< HEAD
-=======
-import 'package:ieee_website/Home_screen/members/models/url_helper.dart';
-import 'package:ieee_website/Join_us/join.dart';
->>>>>>> 584281bb6f0f95576480bd78cec867ae47ffe09c
-import 'package:ieee_website/Projects/projects_page.dart';
 import 'package:ieee_website/Projects/projects_page.dart';
 import 'package:ieee_website/Themes/website_colors.dart';
 
