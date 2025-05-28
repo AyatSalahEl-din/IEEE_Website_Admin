@@ -49,12 +49,17 @@ class _UpdateProjectPageState extends State<UpdateProjectPage> {
         TextEditingController(),
       ); // Add at least one controller
     }
-    _nameController = TextEditingController();
-    _descriptionController = TextEditingController();
+    _nameController = TextEditingController(
+      text: widget.project.title,
+    ); // Initialize with project title
+    _descriptionController = TextEditingController(
+      text: widget.project.description,
+    ); // Initialize with project description
     _tagsController.text =
         widget.project.tags.isNotEmpty ? widget.project.tags.join(', ') : '';
     _madeByController.text = widget.project.madeBy ?? '';
-    // _selectedDate = widget.project.date ?? DateTime.now();
+    _selectedDate =
+        widget.project.date ?? DateTime.now(); // Initialize with project date
 
     // Initialize additional details
     int index = 0;
@@ -295,13 +300,14 @@ class _UpdateProjectPageState extends State<UpdateProjectPage> {
                       style: TextButton.styleFrom(
                         foregroundColor: WebsiteColors.primaryBlueColor,
                       ),
-                    ),textTheme: TextTheme(
-                  bodyMedium: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                    ),
+                    textTheme: TextTheme(
+                      bodyMedium: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                   child: child!,
                 );
