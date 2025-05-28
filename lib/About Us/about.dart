@@ -22,6 +22,15 @@ class _AboutUsState extends State<AboutUs> {
   // Values section
   List<Map<String, dynamic>> _valuesData = [];
 
+  // Color scheme
+  static const Color primaryColor = Color(0xFF2563eb);
+  static const Color primaryLight = Color(0xFFdbeafe);
+  static const Color surfaceColor = Color(0xFFfafafa);
+  static const Color cardColor = Colors.white;
+  static const Color borderColor = Color(0xFFe5e7eb);
+  static const Color textPrimary = Color(0xFF111827);
+  static const Color textSecondary = Color(0xFF6b7280);
+
   @override
   void initState() {
     super.initState();
@@ -49,7 +58,7 @@ class _AboutUsState extends State<AboutUs> {
       if (aboutSnapshot.exists) {
         final mainData = aboutSnapshot.data() ?? {};
 
-        // Initialize controllers for each field - removed video related fields
+        // Initialize controllers for each field
         [
           'heroTitle', 'heroSubtitle', 'heroHighlight',
           'missionTitle', 'missionParagraph1', 'missionParagraph2',
@@ -102,7 +111,7 @@ class _AboutUsState extends State<AboutUs> {
   void _addNewValueItem() {
     setState(() {
       _valuesData.add({
-        'id': null, // Will be assigned by Firestore when saved
+        'id': null,
         'icon': 'star',
         'title': '',
         'description': '',
@@ -136,7 +145,7 @@ class _AboutUsState extends State<AboutUs> {
     });
 
     try {
-      // Save main data - removed video related fields
+      // Save main data
       final mainData = {
         'heroTitle': _controllers['heroTitle']!.text,
         'heroSubtitle': _controllers['heroSubtitle']!.text,
@@ -183,16 +192,34 @@ class _AboutUsState extends State<AboutUs> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Changes saved successfully"),
-          backgroundColor: Colors.green,
+          content: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.white, size: 20),
+              SizedBox(width: 12),
+              Text("Changes saved successfully", style: TextStyle(fontSize: 15)),
+            ],
+          ),
+          backgroundColor: Color(0xFF059669),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          margin: EdgeInsets.all(16),
         ),
       );
 
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Error saving data: $e"),
-          backgroundColor: Colors.red,
+          content: Row(
+            children: [
+              Icon(Icons.error_outline, color: Colors.white, size: 20),
+              SizedBox(width: 12),
+              Text("Error saving data: $e", style: TextStyle(fontSize: 15)),
+            ],
+          ),
+          backgroundColor: Color(0xFFdc2626),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          margin: EdgeInsets.all(16),
         ),
       );
     } finally {
@@ -212,89 +239,118 @@ class _AboutUsState extends State<AboutUs> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: surfaceColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0066A0),
+        backgroundColor: cardColor,
+        surfaceTintColor: Colors.transparent,
         title: Text(
-          'About Us - Admin',
+          'About Us Management',
           style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
+            color: textPrimary,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
           ),
         ),
         centerTitle: true,
-        elevation: 2,
+        elevation: 0,
+        shadowColor: Colors.transparent,
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: Container(
+            height: 1,
+            color: borderColor,
+          ),
+        ),
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator(color: Color(0xFF0066A0)))
-          : Container(
-        color: Colors.grey[50],
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              // Content
-              Expanded(
-                child: _buildCombinedContent(),
+          ? Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(
+              color: primaryColor,
+              strokeWidth: 3,
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Loading content...',
+              style: TextStyle(
+                color: textSecondary,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
               ),
+            ),
+          ],
+        ),
+      )
+          : Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            // Content
+            Expanded(
+              child: _buildCombinedContent(),
+            ),
 
-              // Save button
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 4,
-                      offset: Offset(0, -2),
-                    ),
-                  ],
+            // Save button
+            Container(
+              padding: EdgeInsets.fromLTRB(24, 20, 24, 24),
+              decoration: BoxDecoration(
+                color: cardColor,
+                border: Border(
+                  top: BorderSide(color: borderColor, width: 1),
                 ),
-                child: ElevatedButton(
-                  onPressed: _isSaving ? null : _saveData,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF0066A0),
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    elevation: 1,
-                  ),
-                  child: _isSaving
-                      ? Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
+              ),
+              child: SafeArea(
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton(
+                    onPressed: _isSaving ? null : _saveData,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      foregroundColor: Colors.white,
+                      disabledBackgroundColor: borderColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      SizedBox(width: 12),
-                      Text(
-                        "Saving Changes...",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                      elevation: 0,
+                      shadowColor: Colors.transparent,
+                    ),
+                    child: _isSaving
+                        ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2.5,
+                          ),
                         ),
-                      )
-                    ],
-                  )
-                      : Text(
-                    "Save Changes",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                        SizedBox(width: 12),
+                        Text(
+                          "Saving Changes...",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        )
+                      ],
+                    )
+                        : Text(
+                      "Save Changes",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -302,13 +358,14 @@ class _AboutUsState extends State<AboutUs> {
 
   Widget _buildCombinedContent() {
     return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+      padding: EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Hero Section
           _buildSectionCard(
             'Hero Section',
+            Icons.rocket_launch_outlined,
             [
               _buildTextField(
                 controller: _controllers['heroTitle']!,
@@ -332,11 +389,12 @@ class _AboutUsState extends State<AboutUs> {
               ),
             ],
           ),
-          SizedBox(height: 32),
+          SizedBox(height: 24),
 
           // Mission Section
           _buildSectionCard(
             'Mission Section',
+            Icons.flag_outlined,
             [
               _buildTextField(
                 controller: _controllers['missionTitle']!,
@@ -350,66 +408,69 @@ class _AboutUsState extends State<AboutUs> {
                 label: 'Mission Paragraph 1',
                 placeholder: 'IEEE PUA Student Branch (SB) at Pharos University in Alexandria was established in 2014...',
                 validator: _validateRequired,
-                maxLines: 5,
+                maxLines: 4,
               ),
               SizedBox(height: 20),
               _buildTextField(
                 controller: _controllers['missionParagraph2']!,
                 label: 'Mission Paragraph 2',
                 placeholder: 'We provide our members with comprehensive development...',
-                maxLines: 5,
+                maxLines: 4,
               ),
             ],
           ),
-          SizedBox(height: 32),
+          SizedBox(height: 24),
 
           // Community Statement
           _buildSectionCard(
             'Community Statement',
+            Icons.groups_outlined,
             [
               _buildTextField(
                 controller: _controllers['communityStatement']!,
                 label: 'Community Statement',
                 placeholder: 'IEEE PUA SB represents more than just a student organization...',
                 validator: _validateRequired,
-                maxLines: 5,
+                maxLines: 4,
               ),
             ],
           ),
-          SizedBox(height: 32),
+          SizedBox(height: 24),
 
           // What We Do Section
           _buildSectionCard(
-              'What We Do Section',
-              [
-                _buildTextField(
-                  controller: _controllers['whatWeDoTitle']!,
-                  label: 'Section Title',
-                  placeholder: 'What We Do',
-                  validator: _validateRequired,
-                ),
-                SizedBox(height: 20),
-                _buildTextField(
-                  controller: _controllers['empowermentTitle']!,
-                  label: 'Empowerment Title',
-                  placeholder: 'We empower engineering students',
-                  validator: _validateRequired,
-                ),
-                SizedBox(height: 20),
-                _buildTextField(
-                  controller: _controllers['empowermentText']!,
-                  label: 'Empowerment Text',
-                  placeholder: 'Through IEEE-led workshops, hands-on projects...',
-                  validator: _validateRequired,
-                  maxLines: 5,
-                ),
-              ]
+            'What We Do Section',
+            Icons.work_outline,
+            [
+              _buildTextField(
+                controller: _controllers['whatWeDoTitle']!,
+                label: 'Section Title',
+                placeholder: 'What We Do',
+                validator: _validateRequired,
+              ),
+              SizedBox(height: 20),
+              _buildTextField(
+                controller: _controllers['empowermentTitle']!,
+                label: 'Empowerment Title',
+                placeholder: 'We empower engineering students',
+                validator: _validateRequired,
+              ),
+              SizedBox(height: 20),
+              _buildTextField(
+                controller: _controllers['empowermentText']!,
+                label: 'Empowerment Text',
+                placeholder: 'Through IEEE-led workshops, hands-on projects...',
+                validator: _validateRequired,
+                maxLines: 4,
+              ),
+            ],
           ),
-          SizedBox(height: 32),
+          SizedBox(height: 24),
 
           // Values Section Title
           _buildSectionCard(
             'Values Section',
+            Icons.auto_awesome_outlined,
             [
               _buildTextField(
                 controller: _controllers['valuesTitle']!,
@@ -419,7 +480,7 @@ class _AboutUsState extends State<AboutUs> {
               ),
             ],
           ),
-          SizedBox(height: 32),
+          SizedBox(height: 24),
 
           // Core Values Items
           _buildCoreValuesSection(),
@@ -429,140 +490,161 @@ class _AboutUsState extends State<AboutUs> {
   }
 
   Widget _buildCoreValuesSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Core Values header card
-        Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: Container(
-            width: double.infinity,
+    return Container(
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor, width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Container(
             padding: EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(color: borderColor, width: 1),
+              ),
+            ),
+            child: Row(
               children: [
                 Container(
-                  margin: EdgeInsets.only(bottom: 24),
-                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  width: 44,
+                  height: 44,
                   decoration: BoxDecoration(
-                    color: Color(0xFF0066A0).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    color: primaryLight,
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(
-                    'Core Values',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF0066A0),
-                    ),
+                  child: Icon(
+                    Icons.psychology_outlined,
+                    color: primaryColor,
+                    size: 24,
                   ),
                 ),
+                SizedBox(width: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Core Values',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: textPrimary,
+                      ),
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      'Define your organization\'s core principles',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
 
-                // Value items
+          // Value items
+          Padding(
+            padding: EdgeInsets.all(24),
+            child: Column(
+              children: [
                 ..._valuesData.asMap().entries.map((entry) {
                   final index = entry.key;
                   final item = entry.value;
 
                   return Container(
-                    margin: EdgeInsets.only(bottom: 32),
+                    margin: EdgeInsets.only(bottom: index == _valuesData.length - 1 ? 0 : 20),
                     padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.grey[300]!),
+                      color: surfaceColor,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: borderColor, width: 1),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Header row
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                Container(
-                                  width: 36,
-                                  height: 36,
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFF0066A0).withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      '${index + 1}',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF0066A0),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 12),
-                                Text(
-                                  'Core Value ${index + 1}',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF0066A0),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.delete_outline, color: Colors.red[700], size: 24),
-                              constraints: BoxConstraints(
-                                minWidth: 40,
-                                minHeight: 40,
+                            // Cleaner number badge
+                            Container(
+                              width: 28,
+                              height: 28,
+                              decoration: BoxDecoration(
+                                color: primaryColor,
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              padding: EdgeInsets.zero,
+                              child: Center(
+                                child: Text(
+                                  '${index + 1}',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'Value ${index + 1}',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: textPrimary,
+                                ),
+                              ),
+                            ),
+                            // Delete button
+                            IconButton(
+                              icon: Icon(
+                                Icons.delete_outline,
+                                color: Color(0xFFef4444),
+                                size: 20,
+                              ),
                               onPressed: _valuesData.length > 1
                                   ? () => _removeValueItem(index)
                                   : null,
-                              tooltip: 'Remove value item',
+                              constraints: BoxConstraints(
+                                minWidth: 36,
+                                minHeight: 36,
+                              ),
+                              padding: EdgeInsets.all(8),
+                              tooltip: 'Remove value',
+                              style: IconButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                hoverColor: Color(0xFFfef2f2),
+                              ),
                             ),
                           ],
                         ),
-                        SizedBox(height: 24),
+                        SizedBox(height: 20),
 
-                        // Icon field with dropdown
+                        // Icon dropdown
                         DropdownButtonFormField<String>(
                           value: (item['iconController'] as TextEditingController).text,
-                          decoration: InputDecoration(
-                            labelText: 'Icon',
-                            labelStyle: TextStyle(
-                              color: Colors.grey[700],
-                              fontWeight: FontWeight.w500,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: Colors.grey[300]!),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: Color(0xFF0066A0), width: 2),
-                            ),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                            filled: true,
-                            fillColor: Colors.white,
+                          decoration: _buildInputDecoration(
+                            label: 'Icon',
                             prefixIcon: Icon(
                               _getIconData((item['iconController'] as TextEditingController).text),
-                              color: Color(0xFF0066A0),
-                              size: 24,
+                              color: primaryColor,
+                              size: 20,
                             ),
                           ),
                           items: [
                             _buildIconDropdownItem('people', 'People'),
                             _buildIconDropdownItem('lightbulb', 'Lightbulb'),
-                            _buildIconDropdownItem('trending_up', 'Trending Up'),
-                            _buildIconDropdownItem('school', 'School'),
+                            _buildIconDropdownItem('trending_up', 'Growth'),
+                            _buildIconDropdownItem('school', 'Education'),
                             _buildIconDropdownItem('engineering', 'Engineering'),
-                            _buildIconDropdownItem('group_work', 'Group Work'),
-                            _buildIconDropdownItem('star', 'Star'),
+                            _buildIconDropdownItem('group_work', 'Teamwork'),
+                            _buildIconDropdownItem('star', 'Excellence'),
                           ],
                           onChanged: (value) {
                             setState(() {
@@ -570,11 +652,12 @@ class _AboutUsState extends State<AboutUs> {
                             });
                           },
                           validator: _validateRequired,
-                          icon: Icon(Icons.arrow_drop_down, color: Color(0xFF0066A0)),
+                          icon: Icon(Icons.keyboard_arrow_down, color: textSecondary, size: 20),
                           isExpanded: true,
-                          dropdownColor: Colors.white,
+                          dropdownColor: cardColor,
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        SizedBox(height: 24),
+                        SizedBox(height: 16),
 
                         // Title field
                         _buildTextField(
@@ -583,7 +666,7 @@ class _AboutUsState extends State<AboutUs> {
                           placeholder: 'e.g., Collaboration',
                           validator: _validateRequired,
                         ),
-                        SizedBox(height: 24),
+                        SizedBox(height: 16),
 
                         // Description field
                         _buildTextField(
@@ -599,22 +682,23 @@ class _AboutUsState extends State<AboutUs> {
                 }).toList(),
 
                 // Add new value button
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Center(
-                    child: ElevatedButton.icon(
-                      onPressed: _addNewValueItem,
-                      icon: Icon(Icons.add_circle_outline, size: 20),
-                      label: Text("Add New Value"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF0066A0),
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                        textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        elevation: 1,
+                SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: OutlinedButton.icon(
+                    onPressed: _addNewValueItem,
+                    icon: Icon(Icons.add, size: 18),
+                    label: Text("Add New Value"),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: primaryColor,
+                      side: BorderSide(color: primaryColor, width: 1.5),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      textStyle: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
@@ -622,42 +706,65 @@ class _AboutUsState extends State<AboutUs> {
               ],
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _buildSectionCard(String title, List<Widget> children) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+  Widget _buildSectionCard(String title, IconData icon, List<Widget> children) {
+    return Container(
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor, width: 1),
       ),
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              margin: EdgeInsets.only(bottom: 24),
-              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              decoration: BoxDecoration(
-                color: Color(0xFF0066A0).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                title,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF0066A0),
-                ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Container(
+            padding: EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(color: borderColor, width: 1),
               ),
             ),
-            ...children,
-          ],
-        ),
+            child: Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: primaryLight,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: primaryColor,
+                    size: 24,
+                  ),
+                ),
+                SizedBox(width: 16),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Content
+          Padding(
+            padding: EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: children,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -667,17 +774,62 @@ class _AboutUsState extends State<AboutUs> {
       value: value,
       child: Row(
         children: [
-          Icon(_getIconData(value), size: 20, color: Color(0xFF0066A0)),
+          Icon(_getIconData(value), size: 18, color: primaryColor),
           SizedBox(width: 12),
           Text(
-              label,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[800],
-              )
+            label,
+            style: TextStyle(
+              fontSize: 15,
+              color: textPrimary,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ),
+    );
+  }
+
+  InputDecoration _buildInputDecoration({
+    required String label,
+    String? hint,
+    Widget? prefixIcon,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      hintText: hint,
+      labelStyle: TextStyle(
+        color: textSecondary,
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+      ),
+      hintStyle: TextStyle(
+        color: Color(0xFF9ca3af),
+        fontSize: 15,
+      ),
+      prefixIcon: prefixIcon,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: borderColor, width: 1),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: borderColor, width: 1),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: primaryColor, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: Color(0xFFef4444), width: 1),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: Color(0xFFef4444), width: 2),
+      ),
+      contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+      filled: true,
+      fillColor: cardColor,
     );
   }
 
@@ -691,37 +843,14 @@ class _AboutUsState extends State<AboutUs> {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
-      style: TextStyle(fontSize: 16),
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: placeholder,
-        labelStyle: TextStyle(
-          color: Colors.grey[700],
-          fontWeight: FontWeight.w500,
-        ),
-        hintStyle: TextStyle(color: Colors.grey[400]),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey[300]!),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey[300]!),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Color(0xFF0066A0), width: 2),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.red, width: 1),
-        ),
-        contentPadding: EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: maxLines > 1 ? 16 : 12
-        ),
-        filled: true,
-        fillColor: Colors.white,
+      style: TextStyle(
+        fontSize: 15,
+        color: textPrimary,
+        fontWeight: FontWeight.w500,
+      ),
+      decoration: _buildInputDecoration(
+        label: label,
+        hint: placeholder,
       ),
       validator: validator,
     );
@@ -742,7 +871,7 @@ class _AboutUsState extends State<AboutUs> {
       case 'group_work':
         return Icons.group_work;
       default:
-        return Icons.star; // Default icon
+        return Icons.star;
     }
   }
 }
