@@ -155,15 +155,6 @@ class _ContactState extends State<Contact> {
               children: [
                 Icon(Icons.contacts, color: Colors.white, size: 24),
                 SizedBox(width: 12),
-                Text(
-                  'Contact Management',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.5,
-                  ),
-                ),
               ],
             ),
           ),

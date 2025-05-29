@@ -25,6 +25,9 @@ class FAQForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.8,
+      ),
       decoration: BoxDecoration(
         color: WebsiteColors.whiteColor,
         borderRadius: BorderRadius.circular(16),
@@ -36,145 +39,148 @@ class FAQForm extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        children: [
-          // Form Header
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  WebsiteColors.primaryBlueColor,
-                  WebsiteColors.primaryBlueColor.withOpacity(0.8),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
-              ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: WebsiteColors.whiteColor.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    isEditing ? Icons.edit_note : Icons.add_circle_outline,
-                    color: WebsiteColors.whiteColor,
-                    size: 20,
-                  ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Form Header
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    WebsiteColors.primaryBlueColor,
+                    WebsiteColors.primaryBlueColor.withOpacity(0.8),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        isEditing ? "Edit Question" : "Add New Question",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: WebsiteColors.whiteColor,
-                        ),
-                      ),
-                      Text(
-                        isEditing
-                            ? "Update the existing FAQ item"
-                            : "Create a new FAQ entry",
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: WebsiteColors.whiteColor.withOpacity(0.8),
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
                 ),
-              ],
-            ),
-          ),
-
-          // Form Content
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: Form(
-              key: formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+              child: Row(
                 children: [
-                  // Question Field
-                  _buildFormField(
-                    label: "Question",
-                    hint: "Enter your question here...",
-                    controller: questionController,
-                    icon: Icons.help_outline,
-                    maxLines: 1,
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Please enter a question';
-                      }
-                      if (value.trim().length < 5) {
-                        return 'Question must be at least 5 characters long';
-                      }
-                      return null;
-                    },
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: WebsiteColors.whiteColor.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      isEditing ? Icons.edit_note : Icons.add_circle_outline,
+                      color: WebsiteColors.whiteColor,
+                      size: 20,
+                    ),
                   ),
-                  const SizedBox(height: 20),
-
-                  // Answer Field
-                  _buildFormField(
-                    label: "Answer",
-                    hint: "Provide a detailed answer...",
-                    controller: answerController,
-                    icon: Icons.lightbulb_outline,
-                    maxLines: 4,
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Please enter an answer';
-                      }
-                      if (value.trim().length < 10) {
-                        return 'Answer must be at least 10 characters long';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Form Actions
-                  Row(
-                    children: [
-                      if (isEditing) ...[
-                        Expanded(
-                          child: SecondaryButton(
-                            label: "Cancel",
-                            icon: Icons.cancel_outlined,
-                            onPressed: onCancel,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isEditing ? "Edit Question" : "Add New Question",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: WebsiteColors.whiteColor,
                           ),
                         ),
-                        const SizedBox(width: 12),
-                      ],
-                      Expanded(
-                        child: PrimaryButton(
-                          label: isEditing ? "Update Question" : "Add Question",
-                          icon: isEditing
-                              ? Icons.save_outlined
-                              : Icons.add_circle_outline,
-                          onPressed: onAddOrUpdate,
+                        Text(
+                          isEditing
+                              ? "Update the existing FAQ item"
+                              : "Create a new FAQ entry",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: WebsiteColors.whiteColor.withOpacity(0.8),
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+
+            // Form Content
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Question Field
+                    _buildFormField(
+                      label: "Question",
+                      hint: "Enter your question here...",
+                      controller: questionController,
+                      icon: Icons.help_outline,
+                      maxLines: 1,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Please enter a question';
+                        }
+                        if (value.trim().length < 5) {
+                          return 'Question must be at least 5 characters long';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Answer Field
+                    _buildFormField(
+                      label: "Answer",
+                      hint: "Provide a detailed answer...",
+                      controller: answerController,
+                      icon: Icons.lightbulb_outline,
+                      maxLines: 4,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Please enter an answer';
+                        }
+                        if (value.trim().length < 10) {
+                          return 'Answer must be at least 10 characters long';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Form Actions
+                    Row(
+                      children: [
+                        if (isEditing) ...[
+                          Expanded(
+                            child: SecondaryButton(
+                              label: "Cancel",
+                              icon: Icons.cancel_outlined,
+                              onPressed: onCancel,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                        ],
+                        Expanded(
+                          child: PrimaryButton(
+                            label: isEditing ? "Update Question" : "Add Question",
+                            icon: isEditing
+                                ? Icons.save_outlined
+                                : Icons.add_circle_outline,
+                            onPressed: onAddOrUpdate,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

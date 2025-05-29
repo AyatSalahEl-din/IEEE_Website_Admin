@@ -117,6 +117,7 @@ class FAQList extends StatelessWidget {
                   canvasColor: Colors.transparent,
                 ),
                 child: ReorderableListView.builder(
+                  key: Key('faq_list_${docs.length}'), // Unique key for list
                   itemCount: docs.length,
                   onReorder: (oldIndex, newIndex) =>
                       onReorder(oldIndex, newIndex, docs),

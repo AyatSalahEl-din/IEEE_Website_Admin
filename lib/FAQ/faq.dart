@@ -242,9 +242,6 @@ class _FAQState extends State<FAQ> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final isSmallScreen = size.width < 900;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -254,81 +251,94 @@ class _FAQState extends State<FAQ> {
         elevation: 0,
         backgroundColor: WebsiteColors.primaryBlueColor,
       ),
-      body: Container(
-        color: Colors.grey.shade50,
-        height: size.height,
-        width: size.width,
-        padding: EdgeInsets.symmetric(
-            horizontal: isSmallScreen ? 8 : 16, vertical: 8),
-        child: isSmallScreen
-            ? SingleChildScrollView(
-          controller: _scrollController,
-          child: Column(
-            children: [
-              FAQForm(
-                formKey: _formKey,
-                questionController: questionController,
-                answerController: answerController,
-                isEditing: isEditing,
-                currentDocId: currentDocId,
-                onAddOrUpdate: addOrUpdateFAQItem,
-                onCancel: () {
-                  setState(() {
-                    questionController.clear();
-                    answerController.clear();
-                    isEditing = false;
-                    currentDocId = '';
-                  });
-                },
-              ),
-              const SizedBox(height: 16),
-              FAQList(
-                isSmallScreen: true,
-                currentDocId: currentDocId,
-                onEdit: editFAQItem,
-                onDelete: deleteFAQItem,
-                onReorder: reorderFAQ,
-              ),
-            ],
-          ),
-        )
-            : Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 5,
-              child: FAQList(
-                isSmallScreen: false,
-                currentDocId: currentDocId,
-                onEdit: editFAQItem,
-                onDelete: deleteFAQItem,
-                onReorder: reorderFAQ,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              flex: 4,
-              child: SingleChildScrollView(
-                child: FAQForm(
-                  formKey: _formKey,
-                  questionController: questionController,
-                  answerController: answerController,
-                  isEditing: isEditing,
-                  currentDocId: currentDocId,
-                  onAddOrUpdate: addOrUpdateFAQItem,
-                  onCancel: () {
-                    setState(() {
-                      questionController.clear();
-                      answerController.clear();
-                      isEditing = false;
-                      currentDocId = '';
-                    });
-                  },
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isSmallScreen = constraints.maxWidth < 900;
+
+          return Container(
+            color: Colors.grey.shade50,
+            padding: EdgeInsets.symmetric(
+                horizontal: isSmallScreen ? 8 : 16,
+                vertical: 8),
+            child: isSmallScreen
+                ? SingleChildScrollView(
+              controller: _scrollController,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
+                ),
+                child: Column(
+                  children: [
+                    FAQForm(
+                      formKey: _formKey,
+                      questionController: questionController,
+                      answerController: answerController,
+                      isEditing: isEditing,
+                      currentDocId: currentDocId,
+                      onAddOrUpdate: addOrUpdateFAQItem,
+                      onCancel: () {
+                        setState(() {
+                          questionController.clear();
+                          answerController.clear();
+                          isEditing = false;
+                          currentDocId = '';
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      height: constraints.maxHeight * 0.7,
+                      child: FAQList(
+                        isSmallScreen: true,
+                        currentDocId: currentDocId,
+                        onEdit: editFAQItem,
+                        onDelete: deleteFAQItem,
+                        onReorder: reorderFAQ,
+                      ),
+                    ),
+                  ],
                 ),
               ),
+            )
+                : Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 5,
+                  child: FAQList(
+                    isSmallScreen: false,
+                    currentDocId: currentDocId,
+                    onEdit: editFAQItem,
+                    onDelete: deleteFAQItem,
+                    onReorder: reorderFAQ,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  flex: 4,
+                  child: SingleChildScrollView(
+                    child: FAQForm(
+                      formKey: _formKey,
+                      questionController: questionController,
+                      answerController: answerController,
+                      isEditing: isEditing,
+                      currentDocId: currentDocId,
+                      onAddOrUpdate: addOrUpdateFAQItem,
+                      onCancel: () {
+                        setState(() {
+                          questionController.clear();
+                          answerController.clear();
+                          isEditing = false;
+                          currentDocId = '';
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
