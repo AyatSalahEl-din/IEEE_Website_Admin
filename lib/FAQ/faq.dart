@@ -38,21 +38,23 @@ class _FAQState extends State<FAQ> {
 
     try {
       if (isEditing) {
-        await FirebaseFirestore.instance.collection('faq')
+        await FirebaseFirestore.instance
+            .collection('faq')
             .doc(currentDocId)
             .update({
-          'question': question,
-          'answer': answer,
-          'updatedAt': FieldValue.serverTimestamp(),
-        });
+              'question': question,
+              'answer': answer,
+              'updatedAt': FieldValue.serverTimestamp(),
+            });
         isEditing = false;
         currentDocId = '';
       } else {
-        QuerySnapshot snapshot = await FirebaseFirestore.instance
-            .collection('faq')
-            .orderBy('order', descending: true)
-            .limit(1)
-            .get();
+        QuerySnapshot snapshot =
+            await FirebaseFirestore.instance
+                .collection('faq')
+                .orderBy('order', descending: true)
+                .limit(1)
+                .get();
 
         int nextOrder = 1;
         if (snapshot.docs.isNotEmpty) {
@@ -132,54 +134,69 @@ class _FAQState extends State<FAQ> {
     final size = MediaQuery.of(context).size;
     if (size.width < 900) {
       Future.delayed(const Duration(milliseconds: 100), () {
-        _scrollController.animateTo(0,
-            duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+        _scrollController.animateTo(
+          0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
       });
     }
   }
 
   Future<void> deleteFAQItem(String docId) async {
-    bool confirm = await showDialog(
-      context: context,
-      builder: (context) =>
-          AlertDialog(
-            title: Row(
-              children: [
-                Icon(Icons.warning_amber_rounded,
-                    color: WebsiteColors.primaryYellowColor, size: 18),
-                const SizedBox(width: 8),
-                const Flexible(
-                  child: Text("Confirm Delete", style: TextStyle(fontSize: 16)),
+    bool confirm =
+        await showDialog(
+          context: context,
+          builder:
+              (context) => AlertDialog(
+                title: Row(
+                  children: [
+                    Icon(
+                      Icons.warning_amber_rounded,
+                      color: WebsiteColors.primaryYellowColor,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 8),
+                    const Flexible(
+                      child: Text(
+                        "Confirm Delete",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            content: const Text(
-              "Are you sure you want to delete this question? This action cannot be undone.",
-              style: TextStyle(fontSize: 14),
-            ),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8)),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text("Cancel"),
-              ),
-              ElevatedButton.icon(
-                onPressed: () => Navigator.of(context).pop(true),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: WebsiteColors.redColor,
-                  foregroundColor: WebsiteColors.whiteColor,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6)),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 8),
+                content: const Text(
+                  "Are you sure you want to delete this question? This action cannot be undone.",
+                  style: TextStyle(fontSize: 14),
                 ),
-                icon: const Icon(Icons.delete_outline, size: 16),
-                label: const Text("Delete", style: TextStyle(fontSize: 13)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text("Cancel"),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: WebsiteColors.redColor,
+                      foregroundColor: WebsiteColors.whiteColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                    ),
+                    icon: const Icon(Icons.delete_outline, size: 16),
+                    label: const Text("Delete", style: TextStyle(fontSize: 13)),
+                  ),
+                ],
               ),
-            ],
-          ),
-    ) ?? false;
+        ) ??
+        false;
 
     if (confirm) {
       try {
@@ -192,18 +209,25 @@ class _FAQState extends State<FAQ> {
         }
         setState(() {});
         _showSnackBar(
-            'Question deleted successfully', Icons.check_circle_outline,
-            WebsiteColors.primaryBlueColor);
+          'Question deleted successfully',
+          Icons.check_circle_outline,
+          WebsiteColors.primaryBlueColor,
+        );
       } catch (e) {
         _showSnackBar(
-            'Error deleting question: ${e.toString()}', Icons.error_outline,
-            WebsiteColors.redColor);
+          'Error deleting question: ${e.toString()}',
+          Icons.error_outline,
+          WebsiteColors.redColor,
+        );
       }
     }
   }
 
-  Future<void> reorderFAQ(int oldIndex, int newIndex,
-      List<QueryDocumentSnapshot> docs) async {
+  Future<void> reorderFAQ(
+    int oldIndex,
+    int newIndex,
+    List<QueryDocumentSnapshot> docs,
+  ) async {
     if (oldIndex == newIndex) return;
 
     try {
@@ -231,12 +255,17 @@ class _FAQState extends State<FAQ> {
 
       batch.update(movedDoc.reference, {'order': newIndex});
       await batch.commit();
-      _showSnackBar('FAQ order updated', Icons.check_circle_outline,
-          WebsiteColors.primaryBlueColor);
+      _showSnackBar(
+        'FAQ order updated',
+        Icons.check_circle_outline,
+        WebsiteColors.primaryBlueColor,
+      );
     } catch (e) {
       _showSnackBar(
-          'Error reordering questions: ${e.toString()}', Icons.error_outline,
-          WebsiteColors.redColor);
+        'Error reordering questions: ${e.toString()}',
+        Icons.error_outline,
+        WebsiteColors.redColor,
+      );
     }
   }
 
@@ -259,76 +288,79 @@ class _FAQState extends State<FAQ> {
         height: size.height,
         width: size.width,
         padding: EdgeInsets.symmetric(
-            horizontal: isSmallScreen ? 8 : 16, vertical: 8),
-        child: isSmallScreen
-            ? SingleChildScrollView(
-          controller: _scrollController,
-          child: Column(
-            children: [
-              FAQForm(
-                formKey: _formKey,
-                questionController: questionController,
-                answerController: answerController,
-                isEditing: isEditing,
-                currentDocId: currentDocId,
-                onAddOrUpdate: addOrUpdateFAQItem,
-                onCancel: () {
-                  setState(() {
-                    questionController.clear();
-                    answerController.clear();
-                    isEditing = false;
-                    currentDocId = '';
-                  });
-                },
-              ),
-              const SizedBox(height: 16),
-              FAQList(
-                isSmallScreen: true,
-                currentDocId: currentDocId,
-                onEdit: editFAQItem,
-                onDelete: deleteFAQItem,
-                onReorder: reorderFAQ,
-              ),
-            ],
-          ),
-        )
-            : Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 5,
-              child: FAQList(
-                isSmallScreen: false,
-                currentDocId: currentDocId,
-                onEdit: editFAQItem,
-                onDelete: deleteFAQItem,
-                onReorder: reorderFAQ,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              flex: 4,
-              child: SingleChildScrollView(
-                child: FAQForm(
-                  formKey: _formKey,
-                  questionController: questionController,
-                  answerController: answerController,
-                  isEditing: isEditing,
-                  currentDocId: currentDocId,
-                  onAddOrUpdate: addOrUpdateFAQItem,
-                  onCancel: () {
-                    setState(() {
-                      questionController.clear();
-                      answerController.clear();
-                      isEditing = false;
-                      currentDocId = '';
-                    });
-                  },
-                ),
-              ),
-            ),
-          ],
+          horizontal: isSmallScreen ? 8 : 16,
+          vertical: 8,
         ),
+        child:
+            isSmallScreen
+                ? SingleChildScrollView(
+                  controller: _scrollController,
+                  child: Column(
+                    children: [
+                      FAQForm(
+                        formKey: _formKey,
+                        questionController: questionController,
+                        answerController: answerController,
+                        isEditing: isEditing,
+                        currentDocId: currentDocId,
+                        onAddOrUpdate: addOrUpdateFAQItem,
+                        onCancel: () {
+                          setState(() {
+                            questionController.clear();
+                            answerController.clear();
+                            isEditing = false;
+                            currentDocId = '';
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      FAQList(
+                        isSmallScreen: true,
+                        currentDocId: currentDocId,
+                        onEdit: editFAQItem,
+                        onDelete: deleteFAQItem,
+                        onReorder: reorderFAQ,
+                      ),
+                    ],
+                  ),
+                )
+                : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 5,
+                      child: FAQList(
+                        isSmallScreen: false,
+                        currentDocId: currentDocId,
+                        onEdit: editFAQItem,
+                        onDelete: deleteFAQItem,
+                        onReorder: reorderFAQ,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      flex: 4,
+                      child: SingleChildScrollView(
+                        child: FAQForm(
+                          formKey: _formKey,
+                          questionController: questionController,
+                          answerController: answerController,
+                          isEditing: isEditing,
+                          currentDocId: currentDocId,
+                          onAddOrUpdate: addOrUpdateFAQItem,
+                          onCancel: () {
+                            setState(() {
+                              questionController.clear();
+                              answerController.clear();
+                              isEditing = false;
+                              currentDocId = '';
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
       ),
     );
   }
