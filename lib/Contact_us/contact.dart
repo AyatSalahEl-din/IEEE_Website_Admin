@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class Contact extends StatefulWidget {
   static const String routeName = 'contact';
@@ -36,22 +37,27 @@ class _ContactState extends State<Contact> {
       final data = doc.data();
 
       if (data != null) {
-        _headerTitleController.text = data['headerTitle'] ?? '';
-        _headerDescriptionController.text = data['headerDescription'] ?? '';
-        _addressController.text = data['address'] ?? '';
+        _headerTitleController.text = data['headerTitle'] ?? 'Contact Us';
+        _headerDescriptionController.text = data['headerDescription'] ?? 'Fill up the form and our Team will get back to you';
+        _addressController.text = data['address'] ?? 'Pharos University in Alexandria (PUA)';
 
-        final emails = List<String>.from(data['emails'] ?? []);
+        final emails = List<String>.from(data['emails'] ?? ['pua-ieee-sb@pua.edu.eg', 'ieee.pua.sb.pr@gmail.com']);
         _emailControllers.clear();
         for (var email in emails) {
           _emailControllers.add(TextEditingController(text: email));
         }
 
-        // Add at least one email field if none exist
         if (_emailControllers.isEmpty) {
-          _emailControllers.add(TextEditingController());
+          _emailControllers.add(TextEditingController(text: 'pua-ieee-sb@pua.edu.eg'));
+          _emailControllers.add(TextEditingController(text: 'ieee.pua.sb.pr@gmail.com'));
         }
 
-        final socialLinks = Map<String, dynamic>.from(data['socialLinks'] ?? {});
+        final socialLinks = Map<String, dynamic>.from(data['socialLinks'] ?? {
+          'facebook': 'https://www.facebook.com/share/1YKyPBgRVK/',
+          'linkedin': 'https://www.linkedin.com/company/ieee-pua-student-branch/',
+          'instagram': 'https://www.instagram.com/ieeepua?igsh=MWVla2RzbmJkNTZ5MQ==',
+        });
+
         socialLinks.forEach((key, value) {
           if (_socialLinksControllers.containsKey(key)) {
             _socialLinksControllers[key]!.text = value ?? '';
@@ -84,6 +90,7 @@ class _ContactState extends State<Contact> {
           for (var entry in _socialLinksControllers.entries)
             entry.key: entry.value.text.trim(),
         },
+        'lastUpdated': FieldValue.serverTimestamp(),
       };
 
       await FirebaseFirestore.instance.collection('contact_page').doc('content').set(updatedData);
@@ -134,7 +141,6 @@ class _ContactState extends State<Contact> {
           ? Center(child: CircularProgressIndicator(color: Color(0xFF0066A0)))
           : Column(
         children: [
-          // Enhanced top navigation bar
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -155,11 +161,18 @@ class _ContactState extends State<Contact> {
               children: [
                 Icon(Icons.contacts, color: Colors.white, size: 24),
                 SizedBox(width: 12),
+                Text(
+                  'Contact Management',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
+                ),
               ],
             ),
           ),
-
-          // Enhanced content area
           Expanded(
             child: SingleChildScrollView(
               child: Padding(
@@ -167,7 +180,6 @@ class _ContactState extends State<Contact> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Header Information Card
                     _buildSectionCard(
                       title: 'Header Information',
                       icon: Icons.dashboard_outlined,
@@ -188,10 +200,7 @@ class _ContactState extends State<Contact> {
                         ),
                       ],
                     ),
-
                     SizedBox(height: 24),
-
-                    // Contact Details Card
                     _buildSectionCard(
                       title: 'Contact Information',
                       icon: Icons.location_on_outlined,
@@ -205,10 +214,7 @@ class _ContactState extends State<Contact> {
                         ),
                       ],
                     ),
-
                     SizedBox(height: 24),
-
-                    // Email Addresses Card
                     _buildSectionCard(
                       title: 'Email Addresses',
                       icon: Icons.email_outlined,
@@ -238,10 +244,7 @@ class _ContactState extends State<Contact> {
                         }).toList(),
                       ],
                     ),
-
                     SizedBox(height: 24),
-
-                    // Social Media Links Card
                     _buildSectionCard(
                       title: 'Social Media Links',
                       icon: Icons.share_outlined,
@@ -250,28 +253,25 @@ class _ContactState extends State<Contact> {
                           icon: Icons.facebook_outlined,
                           label: 'Facebook Page',
                           controller: _socialLinksControllers['facebook']!,
-                          placeholder: 'https://facebook.com/yourpage',
+                          placeholder: 'https://www.facebook.com/share/1YKyPBgRVK/',
                         ),
                         SizedBox(height: 16),
                         _buildSocialField(
                           icon: Icons.business_center_outlined,
                           label: 'LinkedIn Profile',
                           controller: _socialLinksControllers['linkedin']!,
-                          placeholder: 'https://linkedin.com/company/yourcompany',
+                          placeholder: 'https://www.linkedin.com/company/ieee-pua-student-branch/',
                         ),
                         SizedBox(height: 16),
                         _buildSocialField(
                           icon: Icons.camera_alt_outlined,
                           label: 'Instagram Account',
                           controller: _socialLinksControllers['instagram']!,
-                          placeholder: 'https://instagram.com/youraccount',
+                          placeholder: 'https://www.instagram.com/ieeepua?igsh=MWVla2RzbmJkNTZ5MQ==',
                         ),
                       ],
                     ),
-
                     SizedBox(height: 32),
-
-                    // Enhanced Save button
                     Center(
                       child: Container(
                         width: double.infinity,
