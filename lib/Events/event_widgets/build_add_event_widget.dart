@@ -1,4 +1,3 @@
-// add_event_form.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../Themes/website_colors.dart';
@@ -40,11 +39,11 @@ class AddEventForm extends StatefulWidget {
   final bool isSeatBookingAvailable;
   final TextEditingController busDepartureTimeController;
   final TextEditingController busArrivalTimeController;
-  final TextEditingController appNameController; // Added
-  final TextEditingController appTimeController; // Added
-  final TextEditingController appUrlController; // Added
-  final bool isOnlineEvent; // Added
-  final String? selectedApp; // Added
+  final TextEditingController appNameController;
+  final TextEditingController appTimeController;
+  final TextEditingController appUrlController;
+  final bool isOnlineEvent;
+  final String? selectedApp;
 
   AddEventForm({
     super.key,
@@ -81,11 +80,11 @@ class AddEventForm extends StatefulWidget {
     required this.isSeatBookingAvailable,
     required this.busDepartureTimeController,
     required this.busArrivalTimeController,
-    required this.appNameController, // Added
-    required this.appTimeController, // Added
-    required this.appUrlController, // Added
-    required this.isOnlineEvent, // Added
-    required this.selectedApp, // Added
+    required this.appNameController,
+    required this.appTimeController,
+    required this.appUrlController,
+    required this.isOnlineEvent,
+    required this.selectedApp,
   });
 
   @override
@@ -107,10 +106,15 @@ class _AddEventFormState extends State<AddEventForm> {
   @override
   void initState() {
     super.initState();
-    selectedDate = widget.selectedDate; // Initial value from parent
+    selectedDate = widget.selectedDate;
     isTicketAvailable = widget.isTicketAvailable;
     isTicketLimited = widget.isTicketLimited;
     isSeatBookingAvailable = widget.isSeatBookingAvailable;
+    isOnlineEvent = widget.isOnlineEvent;
+    selectedApp = widget.selectedApp;
+    appNameController.text = widget.appNameController.text;
+    appUrlController.text = widget.appUrlController.text;
+    appTimeController.text = widget.appTimeController.text;
   }
 
   @override
@@ -132,22 +136,20 @@ class _AddEventFormState extends State<AddEventForm> {
             controller: widget.nameController,
             labelText: 'Event Name',
             icon: Icons.event,
-            keyboardType: TextInputType.text, // Add required keyboardType
-            onChanged: (value) {}, // Add required onChanged
-            validator:
-                (value) =>
-                    value == null || value.isEmpty ? 'Enter event name' : null,
+            keyboardType: TextInputType.text,
+            onChanged: (value) {},
+            validator: (value) =>
+            value == null || value.isEmpty ? 'Enter event name' : null,
           ),
           SizedBox(height: 30.sp),
           CustomTextFormField(
             controller: widget.categoryController,
             labelText: 'Category',
             icon: Icons.category_outlined,
-            keyboardType: TextInputType.text, // Add required keyboardType
-            onChanged: (value) {}, // Add required onChanged
-            validator:
-                (value) =>
-                    value == null || value.isEmpty ? 'Enter category' : null,
+            keyboardType: TextInputType.text,
+            onChanged: (value) {},
+            validator: (value) =>
+            value == null || value.isEmpty ? 'Enter category' : null,
           ),
           SizedBox(height: 30.sp),
           CustomTextFormField(
@@ -155,19 +157,18 @@ class _AddEventFormState extends State<AddEventForm> {
             labelText: 'Description',
             icon: Icons.description,
             isMultiline: true,
-            keyboardType: TextInputType.multiline, // Add required keyboardType
-            onChanged: (value) {}, // Add required onChanged
-            validator:
-                (value) =>
-                    value == null || value.isEmpty ? 'Enter description' : null,
+            keyboardType: TextInputType.multiline,
+            onChanged: (value) {},
+            validator: (value) =>
+            value == null || value.isEmpty ? 'Enter description' : null,
           ),
           SizedBox(height: 30.sp),
           CustomTextFormField(
             controller: widget.imageUrlController,
             labelText: 'Image URL',
             icon: Icons.image,
-            keyboardType: TextInputType.url, // Add required keyboardType
-            onChanged: (value) {}, // Add required onChanged
+            keyboardType: TextInputType.url,
+            onChanged: (value) {},
           ),
           SizedBox(height: 60.sp),
           ElevatedButton.icon(
@@ -180,17 +181,24 @@ class _AddEventFormState extends State<AddEventForm> {
                 });
               }
             },
-            icon: const Icon(Icons.add, color: Colors.white),
-            label: const Text(
+            icon: const Icon(Icons.add, color: WebsiteColors.whiteColor, size: 28),
+            label: Text(
               'Add Image URL',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(
+                color: WebsiteColors.whiteColor,
+                fontSize: 20.sp,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: WebsiteColors.primaryBlueColor,
+              foregroundColor: WebsiteColors.whiteColor,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(16.sp),
               ),
-              padding: EdgeInsets.symmetric(vertical: 12.sp),
+              padding: EdgeInsets.symmetric(vertical: 16.sp, horizontal: 20.sp),
+              elevation: 6,
+              shadowColor: WebsiteColors.primaryBlueColor.withOpacity(0.4),
             ),
           ),
           SizedBox(height: 30.sp),
@@ -199,7 +207,7 @@ class _AddEventFormState extends State<AddEventForm> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Added Images: ',
+                  'Added Images:',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontSize: 25.sp,
                     color: WebsiteColors.primaryBlueColor,
@@ -207,7 +215,7 @@ class _AddEventFormState extends State<AddEventForm> {
                 ),
                 SizedBox(height: 10.sp),
                 ...widget.imageUrls.map(
-                  (url) => Card(
+                      (url) => Card(
                     margin: const EdgeInsets.symmetric(vertical: 8),
                     elevation: 5,
                     shape: RoundedRectangleBorder(
@@ -219,9 +227,8 @@ class _AddEventFormState extends State<AddEventForm> {
                         width: 80.sp,
                         height: 100.sp,
                         fit: BoxFit.cover,
-                        errorBuilder:
-                            (context, error, stackTrace) =>
-                                const Icon(Icons.broken_image),
+                        errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.broken_image),
                       ),
                       title: Text(url),
                       trailing: IconButton(
@@ -240,16 +247,16 @@ class _AddEventFormState extends State<AddEventForm> {
             controller: widget.locationController,
             labelText: 'Location',
             icon: Icons.location_on,
-            keyboardType: TextInputType.text, // Add required keyboardType
-            onChanged: (value) {}, // Add required onChanged
+            keyboardType: TextInputType.text,
+            onChanged: (value) {},
           ),
           SizedBox(height: 30.sp),
           CustomTextFormField(
             controller: widget.timeController,
             labelText: 'Time (e.g. 3:00 PM)',
             icon: Icons.access_time,
-            keyboardType: TextInputType.datetime, // Add required keyboardType
-            onChanged: (value) {}, // Add required onChanged
+            keyboardType: TextInputType.datetime,
+            onChanged: (value) {},
           ),
           SizedBox(height: 30.sp),
           CustomDatePicker(
@@ -261,18 +268,47 @@ class _AddEventFormState extends State<AddEventForm> {
             },
           ),
           SizedBox(height: 30.sp),
-          SwitchListTile(
-            title: const Text('Is Online Event?'),
-            value: isOnlineEvent,
-            onChanged: (value) {
-              setState(() {
-                isOnlineEvent = value;
-                if (isOnlineEvent) {
-                  isTicketAvailable = false; // Disable tickets if online
-                  isBusAvailable = false; // Disable buses if online
-                }
-              });
-            },
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(10.sp),
+              border: Border.all(
+                color: isOnlineEvent
+                    ? WebsiteColors.darkBlueColor
+                    : Colors.grey[400]!,
+                width: 1,
+              ),
+            ),
+            padding: EdgeInsets.symmetric(vertical: 8.sp, horizontal: 12.sp),
+            child: SwitchListTile(
+              title: Text(
+                'Is Online Event?',
+                style: TextStyle(
+                  fontSize: 22.sp,
+                  fontWeight: FontWeight.w500,
+                  color: WebsiteColors.primaryBlueColor,
+                ),
+              ),
+              value: isOnlineEvent,
+              activeTrackColor: WebsiteColors.darkBlueColor,
+              activeColor: WebsiteColors.whiteColor,
+              inactiveTrackColor: Colors.grey[400],
+              inactiveThumbColor: Colors.white,
+              onChanged: (value) {
+                setState(() {
+                  isOnlineEvent = value;
+                  if (isOnlineEvent) {
+                    isTicketAvailable = false;
+                    isBusAvailable = false;
+                  }
+                });
+              },
+              contentPadding: EdgeInsets.zero,
+              dense: true,
+              visualDensity: VisualDensity.compact,
+              controlAffinity: ListTileControlAffinity.trailing,
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
           ),
           if (isOnlineEvent) ...[
             SizedBox(height: 30.sp),
@@ -280,51 +316,45 @@ class _AddEventFormState extends State<AddEventForm> {
               controller: appTimeController,
               labelText: 'Exact Time (e.g., 3:00 PM)',
               icon: Icons.access_time,
-              keyboardType: TextInputType.datetime, // Add required keyboardType
-              onChanged: (value) {}, // Add required onChanged
-              validator:
-                  (value) =>
-                      value == null || value.isEmpty
-                          ? 'Enter the exact time'
-                          : null,
+              keyboardType: TextInputType.datetime,
+              onChanged: (value) {},
+              validator: (value) =>
+              value == null || value.isEmpty ? 'Enter the exact time' : null,
             ),
             SizedBox(height: 30.sp),
             CustomTextFormField(
               controller: appUrlController,
               labelText: 'Pre-URL (Optional)',
               icon: Icons.link,
-              keyboardType: TextInputType.url, // Add required keyboardType
-              onChanged: (value) {}, // Add required onChanged
+              keyboardType: TextInputType.url,
+              onChanged: (value) {},
             ),
             SizedBox(height: 30.sp),
             DropdownButtonFormField<String>(
               value: selectedApp,
-              items:
-                  ['Zoom', 'Microsoft Teams', 'Google Meet', 'Other'].map((
-                    app,
-                  ) {
-                    return DropdownMenuItem(value: app, child: Text(app));
-                  }).toList(),
+              items: ['Zoom', 'Microsoft Teams', 'Google Meet', 'Other']
+                  .map((app) {
+                return DropdownMenuItem(value: app, child: Text(app));
+              }).toList(),
               onChanged: (value) {
                 setState(() {
                   selectedApp = value;
                   if (value != 'Other') {
-                    appNameController
-                        .clear(); // Clear custom app name if not "Other"
+                    appNameController.clear();
                   }
                 });
               },
               decoration: InputDecoration(
                 labelText: 'Select App Hosting',
+                labelStyle: TextStyle(fontSize: 25.sp,color: WebsiteColors.darkBlueColor),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              validator:
-                  (value) =>
-                      value == null || value.isEmpty
-                          ? 'Select an app hosting option'
-                          : null,
+              validator: (value) =>
+              value == null || value.isEmpty
+                  ? 'Select an app hosting option'
+                  : null,
             ),
             if (selectedApp == 'Other') ...[
               SizedBox(height: 30.sp),
@@ -332,19 +362,15 @@ class _AddEventFormState extends State<AddEventForm> {
                 controller: appNameController,
                 labelText: 'App Name',
                 icon: Icons.apps,
-                keyboardType: TextInputType.text, // Add required keyboardType
-                onChanged: (value) {}, // Add required onChanged
-                validator:
-                    (value) =>
-                        value == null || value.isEmpty
-                            ? 'Enter app name'
-                            : null,
+                keyboardType: TextInputType.text,
+                onChanged: (value) {},
+                validator: (value) =>
+                value == null || value.isEmpty ? 'Enter app name' : null,
               ),
             ],
           ],
           if (!isOnlineEvent) ...[
-            if (selectedDate != null &&
-                selectedDate!.isAfter(DateTime.now())) ...[
+            if (selectedDate != null && selectedDate!.isAfter(DateTime.now())) ...[
               SwitchListTile(
                 title: const Text('Are Tickets Available?'),
                 value: isTicketAvailable,
@@ -352,8 +378,7 @@ class _AddEventFormState extends State<AddEventForm> {
                   setState(() {
                     isTicketAvailable = value;
                     if (!isTicketAvailable) {
-                      isBusAvailable =
-                          false; // Reset bus availability if tickets are unavailable
+                      isBusAvailable = false;
                     }
                   });
                 },
@@ -366,7 +391,6 @@ class _AddEventFormState extends State<AddEventForm> {
                   onChanged: (value) {
                     setState(() {
                       isTicketLimited = value;
-                      // Ensure ticket limits are not reset when toggling bus availability
                     });
                   },
                 ),
@@ -377,11 +401,9 @@ class _AddEventFormState extends State<AddEventForm> {
                     ),
                     labelText: 'Ticket Limit',
                     icon: Icons.confirmation_number,
-                    keyboardType:
-                        TextInputType.number, // Add required keyboardType
+                    keyboardType: TextInputType.number,
                     onChanged: (value) {
-                      widget.ticketLimit =
-                          int.tryParse(value) ?? 0; // Save ticket limit
+                      widget.ticketLimit = int.tryParse(value) ?? 0;
                     },
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -395,14 +417,10 @@ class _AddEventFormState extends State<AddEventForm> {
                   controller: widget.ticketPriceController,
                   labelText: 'Ticket Price',
                   icon: Icons.attach_money,
-                  keyboardType:
-                      TextInputType.number, // Add required keyboardType
-                  onChanged: (value) {}, // Add required onChanged
-                  validator:
-                      (value) =>
-                          value == null || value.isEmpty
-                              ? 'Enter ticket price'
-                              : null,
+                  keyboardType: TextInputType.number,
+                  onChanged: (value) {},
+                  validator: (value) =>
+                  value == null || value.isEmpty ? 'Enter ticket price' : null,
                 ),
                 SizedBox(height: 30.sp),
                 CustomTextFormField(
@@ -410,21 +428,19 @@ class _AddEventFormState extends State<AddEventForm> {
                   labelText: 'Discount (%)',
                   icon: Icons.discount,
                   keyboardType: TextInputType.number,
-                  onChanged: (value) {}, // Add required onChanged
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Enter discount percentage';
-                    }
-                    return null;
-                  },
+                  onChanged: (value) {},
+                  validator: (value) =>
+                  value == null || value.isEmpty
+                      ? 'Enter discount percentage'
+                      : null,
                 ),
                 SizedBox(height: 30.sp),
                 CustomTextFormField(
                   controller: widget.discountForController,
                   labelText: 'Discount For (e.g., Students)',
                   icon: Icons.group,
-                  keyboardType: TextInputType.text, // Add required keyboardType
-                  onChanged: (value) {}, // Add required onChanged
+                  keyboardType: TextInputType.text,
+                  onChanged: (value) {},
                 ),
                 SizedBox(height: 30.sp),
                 SwitchListTile(
@@ -433,7 +449,6 @@ class _AddEventFormState extends State<AddEventForm> {
                   onChanged: (value) {
                     setState(() {
                       isBusAvailable = value;
-                      // Ensure ticket limits are not affected when toggling bus availability
                     });
                   },
                 ),
@@ -445,16 +460,14 @@ class _AddEventFormState extends State<AddEventForm> {
                     ),
                     labelText: 'Number of Buses',
                     icon: Icons.directions_bus,
-                    keyboardType:
-                        TextInputType.number, // Add required keyboardType
-                    onChanged: (value) {}, // Add required onChanged
+                    keyboardType: TextInputType.number,
+                    onChanged: (value) {
+                      widget.numberOfBuses = int.tryParse(value) ?? 0;
+                    },
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Enter number of buses';
                       }
-                      widget.numberOfBuses =
-                          int.tryParse(value) ??
-                          0; // Ensure number of buses is saved
                       return null;
                     },
                   ),
@@ -465,16 +478,14 @@ class _AddEventFormState extends State<AddEventForm> {
                     ),
                     labelText: 'Seats Per Bus',
                     icon: Icons.event_seat,
-                    keyboardType:
-                        TextInputType.number, // Add required keyboardType
-                    onChanged: (value) {}, // Add required onChanged
+                    keyboardType: TextInputType.number,
+                    onChanged: (value) {
+                      widget.seatsPerBus = int.tryParse(value) ?? 0;
+                    },
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Enter seats per bus';
                       }
-                      widget.seatsPerBus =
-                          int.tryParse(value) ??
-                          0; // Ensure seats per bus is saved
                       return null;
                     },
                   ),
@@ -483,84 +494,68 @@ class _AddEventFormState extends State<AddEventForm> {
                     controller: widget.busTicketPriceController,
                     labelText: 'Bus Ticket Price Per Seat',
                     icon: Icons.directions_bus,
-                    keyboardType:
-                        TextInputType.number, // Add required keyboardType
-                    onChanged: (value) {}, // Add required onChanged
-                    validator:
-                        (value) =>
-                            value == null || value.isEmpty
-                                ? 'Enter bus ticket price'
-                                : null,
+                    keyboardType: TextInputType.number,
+                    onChanged: (value) {},
+                    validator: (value) =>
+                    value == null || value.isEmpty
+                        ? 'Enter bus ticket price'
+                        : null,
                   ),
                   SizedBox(height: 30.sp),
                   CustomTextFormField(
                     controller: widget.busSourceController,
                     labelText: 'Bus Departure Location',
                     icon: Icons.location_on,
-                    keyboardType:
-                        TextInputType.text, // Add required keyboardType
-                    onChanged: (value) {}, // Add required onChanged
-                    validator:
-                        (value) =>
-                            value == null || value.isEmpty
-                                ? 'Enter departure location'
-                                : null,
+                    keyboardType: TextInputType.text,
+                    onChanged: (value) {},
+                    validator: (value) =>
+                    value == null || value.isEmpty
+                        ? 'Enter departure location'
+                        : null,
                   ),
                   SizedBox(height: 30.sp),
                   CustomTextFormField(
                     controller: widget.busDestinationController,
                     labelText: 'Bus Destination',
                     icon: Icons.location_on,
-                    keyboardType:
-                        TextInputType.text, // Add required keyboardType
-                    onChanged: (value) {}, // Add required onChanged
-                    validator:
-                        (value) =>
-                            value == null || value.isEmpty
-                                ? 'Enter destination'
-                                : null,
+                    keyboardType: TextInputType.text,
+                    onChanged: (value) {},
+                    validator: (value) =>
+                    value == null || value.isEmpty ? 'Enter destination' : null,
                   ),
                   SizedBox(height: 30.sp),
                   CustomTextFormField(
                     controller: widget.busDepartureTimeController,
                     labelText: 'Bus Departure Time',
                     icon: Icons.access_time,
-                    keyboardType:
-                        TextInputType.datetime, // Add required keyboardType
-                    onChanged: (value) {}, // Add required onChanged
-                    validator:
-                        (value) =>
-                            value == null || value.isEmpty
-                                ? 'Enter departure time'
-                                : null,
+                    keyboardType: TextInputType.datetime,
+                    onChanged: (value) {},
+                    validator: (value) =>
+                    value == null || value.isEmpty
+                        ? 'Enter departure time'
+                        : null,
                   ),
                   SizedBox(height: 30.sp),
                   CustomTextFormField(
                     controller: widget.busArrivalTimeController,
                     labelText: 'Bus Arrival Time',
                     icon: Icons.access_time,
-                    keyboardType:
-                        TextInputType.datetime, // Add required keyboardType
-                    onChanged: (value) {}, // Add required onChanged
-                    validator:
-                        (value) =>
-                            value == null || value.isEmpty
-                                ? 'Enter arrival time'
-                                : null,
+                    keyboardType: TextInputType.datetime,
+                    onChanged: (value) {},
+                    validator: (value) =>
+                    value == null || value.isEmpty ? 'Enter arrival time' : null,
                   ),
                   SizedBox(height: 30.sp),
                   CustomTextFormField(
                     controller: widget.tripExplanationController,
                     labelText: 'Program Details',
                     icon: Icons.info,
-                    keyboardType:
-                        TextInputType.text, // Add required keyboardType
-                    onChanged: (value) {}, // Add required onChanged
-                    validator:
-                        (value) =>
-                            value == null || value.isEmpty
-                                ? 'Enter program details'
-                                : null,
+                    keyboardType: TextInputType.text,
+                    onChanged: (value) {},
+                    validator: (value) =>
+                    value == null || value.isEmpty
+                        ? 'Enter program details'
+                        : null,
                   ),
                 ],
               ],
@@ -571,37 +566,34 @@ class _AddEventFormState extends State<AddEventForm> {
             controller: widget.contactNumberController,
             labelText: 'Contact Number',
             icon: Icons.phone,
-            keyboardType: TextInputType.phone, // Add required keyboardType
-            onChanged: (value) {}, // Add required onChanged
-            validator:
-                (value) =>
-                    value == null || value.isEmpty
-                        ? 'Enter contact number'
-                        : null,
+            keyboardType: TextInputType.phone,
+            onChanged: (value) {},
+            validator: (value) =>
+            value == null || value.isEmpty ? 'Enter contact number' : null,
           ),
           SizedBox(height: 30.sp),
           CustomTextFormField(
             controller: widget.contactEmailController,
             labelText: 'Contact Email',
             icon: Icons.email,
-            keyboardType:
-                TextInputType.emailAddress, // Add required keyboardType
-            onChanged: (value) {}, // Add required onChanged
-            validator:
-                (value) =>
-                    value == null || value.isEmpty
-                        ? 'Enter contact email'
-                        : null,
+            keyboardType: TextInputType.emailAddress,
+            onChanged: (value) {},
+            validator: (value) =>
+            value == null || value.isEmpty ? 'Enter contact email' : null,
           ),
           SizedBox(height: 40.sp),
           ConstrainedBox(
-            constraints: BoxConstraints.tightFor(width: 200.sp),
+            constraints: BoxConstraints.tightFor(width: 220.sp),
             child: ElevatedButton(
               onPressed: () async {
                 if (!widget.formKey.currentState!.validate()) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please fill all required fields.'),
+                    SnackBar(
+                      content: Text(
+                        'Please fill all required fields.',
+                        style: TextStyle(fontSize: 18.sp),
+                      ),
+                      backgroundColor: Colors.redAccent,
                     ),
                   );
                   return;
@@ -652,27 +644,30 @@ class _AddEventFormState extends State<AddEventForm> {
                   selectedApp: selectedApp,
                 );
               },
-              child:
-                  widget.isLoading
-                      ? const CircularProgressIndicator(
-                        color: WebsiteColors.primaryBlueColor,
-                      )
-                      : Text(
-                        'Add Event',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: WebsiteColors.whiteColor,
-                          fontSize: 22.sp,
-                        ),
-                      ),
+              child: widget.isLoading
+                  ? const CircularProgressIndicator(
+                color: WebsiteColors.whiteColor,
+              )
+                  : Text(
+                'Add Event',
+                style: TextStyle(
+                  color: WebsiteColors.whiteColor,
+                  fontSize: 24.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: WebsiteColors.primaryBlueColor,
+                foregroundColor: WebsiteColors.whiteColor,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.sp),
+                  borderRadius: BorderRadius.circular(16.sp),
                 ),
                 padding: EdgeInsets.symmetric(
-                  vertical: 12.sp,
-                  horizontal: 12.sp,
+                  vertical: 16.sp,
+                  horizontal: 24.sp,
                 ),
+                elevation: 6,
+                shadowColor: WebsiteColors.primaryBlueColor.withOpacity(0.4),
               ),
             ),
           ),

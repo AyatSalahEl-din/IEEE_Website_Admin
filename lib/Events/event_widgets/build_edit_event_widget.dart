@@ -21,13 +21,15 @@ class _EditEventWidgetState extends State<EditEventWidget> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
+
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: EdgeInsets.all(20.sp), // Use .sp for responsiveness
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Search Bar
                 Row(
@@ -37,19 +39,21 @@ class _EditEventWidgetState extends State<EditEventWidget> {
                         controller: _searchController,
                         decoration: InputDecoration(
                           hintText: 'Search events...',
-                          hintStyle: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(color: WebsiteColors.greyColor),
-                          prefixIcon: const Icon(Icons.search),
+                          hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: WebsiteColors.greyColor,
+                            fontSize: 16.sp,
+                          ),
+                          prefixIcon: Icon(Icons.search, size: 20.sp),
                           fillColor: Colors.grey[100],
                           filled: true,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(12.sp),
                             borderSide: BorderSide.none,
                           ),
                         ),
-                        keyboardType: TextInputType.text, // Add keyboardType
+                        style: TextStyle(fontSize: 16.sp),
+                        keyboardType: TextInputType.text,
                         onChanged: (value) {
-                          // Add onChanged
                           setState(() {
                             _searchQuery = value.toLowerCase();
                           });
@@ -58,192 +62,200 @@ class _EditEventWidgetState extends State<EditEventWidget> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20.sp),
 
                 // StreamBuilder Grid
-                Container(
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height - 250,
-                  ),
-                  child: StreamBuilder<QuerySnapshot>(
-                    stream:
-                        FirebaseFirestore.instance
-                            .collection('events')
-                            .snapshots(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return const Center(child: CircularProgressIndicator());
+                StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance.collection('events').snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    final filteredEvents = snapshot.data!.docs.where((event) {
+                      final data = event.data() as Map<String, dynamic>;
+                      final name = (data['name'] ?? '').toString().toLowerCase();
+                      final dateRaw = data['date'];
+                      String formattedDate = '';
+
+                      if (dateRaw is Timestamp) {
+                        formattedDate = DateFormat.yMMMd().format(dateRaw.toDate()).toLowerCase();
+                      } else if (dateRaw is DateTime) {
+                        formattedDate = DateFormat.yMMMd().format(dateRaw).toLowerCase();
                       }
 
-                      final filteredEvents =
-                          snapshot.data!.docs.where((event) {
-                            final data = event.data() as Map<String, dynamic>;
-                            final name =
-                                (data['name'] ?? '').toString().toLowerCase();
-                            final dateRaw = data['date'];
-                            String formattedDate = '';
+                      return name.contains(_searchQuery) || formattedDate.contains(_searchQuery);
+                    }).toList();
 
-                            if (dateRaw is Timestamp) {
-                              formattedDate =
-                                  DateFormat.yMMMd()
-                                      .format(dateRaw.toDate())
-                                      .toLowerCase();
-                            } else if (dateRaw is DateTime) {
-                              formattedDate =
-                                  DateFormat.yMMMd()
-                                      .format(dateRaw)
-                                      .toLowerCase();
-                            }
+                    if (filteredEvents.isEmpty) {
+                      return Center(
+                        child: Text(
+                          "No events found.",
+                          style: TextStyle(fontSize: 18.sp, color: WebsiteColors.greyColor),
+                        ),
+                      );
+                    }
 
-                            return name.contains(_searchQuery) ||
-                                formattedDate.contains(_searchQuery);
-                          }).toList();
+                    return GridView.builder(
+                      shrinkWrap: true, // Allow GridView to take only needed space
+                      physics: const NeverScrollableScrollPhysics(), // Disable GridView scrolling
+                      itemCount: filteredEvents.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 16.sp,
+                        mainAxisSpacing: 16.sp,
+                        childAspectRatio: 0.9,
+                      ),
+                      itemBuilder: (context, index) {
+                        final event = filteredEvents[index];
+                        final data = event.data() as Map<String, dynamic>;
 
-                      if (filteredEvents.isEmpty) {
-                        return const Center(child: Text("No events found."));
-                      }
+                        final eventName = data['name'] ?? 'No Name';
+                        final eventDate = () {
+                          final date = data['date'];
+                          if (date is Timestamp) {
+                            return DateFormat.yMMMd().format(date.toDate());
+                          } else if (date is DateTime) {
+                            return DateFormat.yMMMd().format(date);
+                          }
+                          return 'No Date';
+                        }();
 
-                      return Expanded(
-                        child: GridView.builder(
-                          itemCount: filteredEvents.length,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                                crossAxisSpacing: 16.sp,
-                                mainAxisSpacing: 16.sp,
-                                childAspectRatio: 0.9,
-                              ),
-                          itemBuilder: (context, index) {
-                            final event = filteredEvents[index];
-                            final data = event.data() as Map<String, dynamic>;
+                        bool isHovered = false;
 
-                            final eventName = data['name'] ?? 'No Name';
-                            final eventDate = () {
-                              final date = data['date'];
-                              if (date is Timestamp) {
-                                return DateFormat.yMMMd().format(date.toDate());
-                              } else if (date is DateTime) {
-                                return DateFormat.yMMMd().format(date);
-                              }
-                              return 'No Date';
-                            }();
-
-                            return Material(
-                              elevation: 2,
-                              borderRadius: BorderRadius.circular(16),
-                              color: Colors.white,
-                              child: Column(
-                                children: [
-                                  // Image Header
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(10.sp),
-                                    child: AspectRatio(
-                                      aspectRatio: 3 / 2,
-                                      child: _buildEventCardImage(data),
-                                    ),
+                        return StatefulBuilder(
+                          builder: (context, setLocalState) {
+                            return MouseRegion(
+                              onEnter: (_) => setLocalState(() => isHovered = true),
+                              onExit: (_) => setLocalState(() => isHovered = false),
+                              child: Transform.scale(
+                                scale: isHovered ? 1.03 : 1.0,
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16.sp),
+                                    boxShadow: isHovered
+                                        ? [
+                                      BoxShadow(
+                                        color: WebsiteColors.primaryBlueColor.withOpacity(0.6),
+                                        blurRadius: 20,
+                                        spreadRadius: 2,
+                                        offset: const Offset(0, 0),
+                                      ),
+                                    ]
+                                        : [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.3),
+                                        blurRadius: 4,
+                                        spreadRadius: 1,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
                                   ),
-
-                                  // Details
-                                  Padding(
-                                    padding: const EdgeInsets.all(12),
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          eventName,
-                                          style: TextStyle(
-                                            fontSize: 30.sp,
-                                            fontWeight: FontWeight.bold,
-                                            color:
-                                                WebsiteColors.primaryBlueColor,
-                                          ),
-                                          textAlign: TextAlign.center,
+                                  child: Column(
+                                    children: [
+                                      // Image Header
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(10.sp),
+                                        child: AspectRatio(
+                                          aspectRatio: 3 / 2,
+                                          child: _buildEventCardImage(data),
                                         ),
-                                        SizedBox(height: 10.sp),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                      ),
+
+                                      // Details
+                                      Padding(
+                                        padding: EdgeInsets.all(12.sp),
+                                        child: Column(
                                           children: [
-                                            const Icon(
-                                              Icons.calendar_month_outlined,
-                                              size: 16,
-                                              color:
-                                                  WebsiteColors
-                                                      .primaryBlueColor,
-                                            ),
-                                            SizedBox(width: 10.sp),
                                             Text(
-                                              eventDate,
-                                              style: Theme.of(
-                                                context,
-                                              ).textTheme.bodyMedium?.copyWith(
-                                                color:
-                                                    WebsiteColors.darkBlueColor,
-                                                fontSize: 25.sp,
+                                              eventName,
+                                              maxLines: 1,
+                                              style: TextStyle(
+                                                fontSize: 30.sp,
+                                                fontWeight: FontWeight.bold,
+                                                color: WebsiteColors.primaryBlueColor,
                                               ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            SizedBox(height: 20.sp),
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  Icons.calendar_month_outlined,
+                                                  size: 16.sp,
+                                                  color: WebsiteColors.primaryBlueColor,
+                                                ),
+                                                SizedBox(width: 10.sp),
+                                                Text(
+                                                  eventDate,
+                                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                                    color: WebsiteColors.darkBlueColor,
+                                                    fontSize: 25.sp,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
-                                      ],
-                                    ),
-                                  ),
+                                      ),
 
-                                  // Edit Button
-                                  const Spacer(),
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 20.sp,
-                                      vertical: 20.sp,
-                                    ),
-                                    child: ElevatedButton.icon(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder:
-                                                (_) => EditEventPage(
+                                      const Spacer(),
+
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 20.sp,
+                                          vertical: 20.sp,
+                                        ),
+                                        child: ElevatedButton.icon(
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => EditEventPage(
                                                   eventId: event.id,
                                                   eventData: data,
                                                 ),
+                                              ),
+                                            );
+                                          },
+                                          icon: Icon(
+                                            Icons.edit,
+                                            size: 25.sp,
+                                            color: WebsiteColors.whiteColor,
                                           ),
-                                        );
-                                      },
-                                      icon: Icon(
-                                        Icons.edit,
-                                        size: 25.sp,
-                                        color: WebsiteColors.whiteColor,
-                                      ),
-                                      label: Text(
-                                        "Edit",
-                                        style: Theme.of(
-                                          context,
-                                        ).textTheme.displayMedium?.copyWith(
-                                          color: WebsiteColors.whiteColor,
-                                          fontSize: 25.sp,
-                                        ),
-                                      ),
-                                      style: ElevatedButton.styleFrom(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 30.sp,
-                                          vertical: 20.sp,
-                                        ),
-                                        backgroundColor: Colors.blue,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12.sp,
+                                          label: Text(
+                                            "Edit",
+                                            style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                                              color: WebsiteColors.whiteColor,
+                                              fontSize: 25.sp,
+                                            ),
+                                          ),
+                                          style: ElevatedButton.styleFrom(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: 50.sp,
+                                              vertical: 30.sp,
+                                            ),
+                                            backgroundColor: Colors.blue,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(12.sp),
+                                            ),
+                                            minimumSize: Size.fromHeight(36.sp),
                                           ),
                                         ),
-                                        minimumSize: Size.fromHeight(36.sp),
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
                             );
                           },
-                        ),
-                      );
-                    },
-                  ),
+                        );
+                      },
+                    );
+                  },
                 ),
               ],
             ),
@@ -255,8 +267,7 @@ class _EditEventWidgetState extends State<EditEventWidget> {
 
   Widget _buildEventCardImage(Map<String, dynamic> data) {
     final List<dynamic>? imgListDynamic = data['imageUrls'];
-    final List<String> firebaseImages =
-        imgListDynamic != null ? List<String>.from(imgListDynamic) : [];
+    final List<String> firebaseImages = imgListDynamic != null ? List<String>.from(imgListDynamic) : [];
 
     final List<String>? localImages = EventsCard.eventImageMap[data['name']];
     String? firstImage;
@@ -269,27 +280,27 @@ class _EditEventWidgetState extends State<EditEventWidget> {
 
     return firstImage != null
         ? firstImage.startsWith("http")
-            ? Image.network(
-              firstImage,
-              width: double.infinity,
-              fit: BoxFit.fill,
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) return child;
-                return Center(
-                  child: CircularProgressIndicator(
-                    value:
-                        loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                                (loadingProgress.expectedTotalBytes ?? 1)
-                            : null,
-                  ),
-                );
-              },
-              errorBuilder:
-                  (context, error, stackTrace) =>
-                      Icon(Icons.broken_image, size: 50.sp, color: Colors.grey),
-            )
-            : Image.asset(firstImage, width: double.infinity, fit: BoxFit.cover)
+        ? Image.network(
+      firstImage,
+      width: double.infinity,
+      fit: BoxFit.fill,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Center(
+          child: CircularProgressIndicator(
+            value: loadingProgress.expectedTotalBytes != null
+                ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
+                : null,
+          ),
+        );
+      },
+      errorBuilder: (context, error, stackTrace) => Icon(
+        Icons.broken_image,
+        size: 50.sp,
+        color: Colors.grey,
+      ),
+    )
+        : Image.asset(firstImage, width: double.infinity, fit: BoxFit.cover)
         : Icon(Icons.broken_image, size: 50.sp, color: Colors.grey);
   }
 }

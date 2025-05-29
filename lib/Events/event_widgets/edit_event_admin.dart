@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -298,48 +300,155 @@ class _EditEventPageState extends State<EditEventPage> {
 
   Future<void> _addImage() async {
     final urlController = TextEditingController();
+    String? imageUrl;
+    bool isValidImage = false;
+
     final result = await showDialog<String>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: WebsiteColors.whiteColor,
-          title: Text(
-            "Enter Image URL",
-            style: TextStyle(
-              color: WebsiteColors.primaryBlueColor,
-              fontSize: 32.sp,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          content: TextField(
-            controller: urlController,
-            decoration: InputDecoration(
-              hintText: "Enter image URL",
-              hintStyle: TextStyle(
-                color: WebsiteColors.greyColor,
-                fontSize: 32.sp,
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: WebsiteColors.whiteColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24.sp),
               ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.0.sp),
-                borderSide: BorderSide(color: WebsiteColors.primaryBlueColor),
+              titlePadding: EdgeInsets.only(top: 28.sp, left: 24.sp, right: 24.sp),
+              contentPadding: EdgeInsets.symmetric(horizontal: 24.sp, vertical: 12.sp),
+              actionsPadding: EdgeInsets.symmetric(horizontal: 20.sp, vertical: 20.sp),
+
+              title: Row(
+                children: [
+                  Icon(Icons.image_outlined, size: 36.sp, color: WebsiteColors.whiteColor),
+                  SizedBox(width: 12.sp),
+                  Text(
+                    "Add Image URL",
+                    style: TextStyle(
+                      fontSize: 36.sp,
+                      fontWeight: FontWeight.bold,
+                      color: WebsiteColors.primaryBlueColor,
+                    ),
+                  ),
+                ],
               ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.0.sp),
-                borderSide: BorderSide(color: WebsiteColors.primaryBlueColor),
+
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: urlController,
+                    onChanged: (value) {
+                      final trimmed = value.trim();
+                      setState(() {
+                        imageUrl = trimmed;
+                        isValidImage = Uri.tryParse(trimmed)?.isAbsolute ?? false;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      hintText: "Paste image URL here...",
+                      hintStyle: TextStyle(fontSize: 28.sp, color: WebsiteColors.greyColor),
+                      prefixIcon: Icon(Icons.link, color: WebsiteColors.greyColor),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 22.sp),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14.sp),
+                        borderSide: BorderSide(color: WebsiteColors.primaryBlueColor),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14.sp),
+                        borderSide: BorderSide(color: WebsiteColors.primaryBlueColor, width: 1.5),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 24.sp),
+
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: imageUrl != null && imageUrl!.isNotEmpty
+                        ? ClipRRect(
+                      key: ValueKey(imageUrl),
+                      borderRadius: BorderRadius.circular(16.sp),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 12.sp,
+                              spreadRadius: 1,
+                              offset: const Offset(0, 3),
+                            )
+                          ],
+                        ),
+                        child: AspectRatio(
+                          aspectRatio: 3 / 2,
+                          child: Image.network(
+                            imageUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Container(
+                              color: Colors.grey[200],
+                              alignment: Alignment.center,
+                              child: Icon(Icons.broken_image, size: 48.sp, color: Colors.grey),
+                            ),
+                            loadingBuilder: (_, child, progress) {
+                              if (progress == null) return child;
+                              return Center(
+                                child: CircularProgressIndicator(
+                                  value: progress.expectedTotalBytes != null
+                                      ? progress.cumulativeBytesLoaded / (progress.expectedTotalBytes ?? 1)
+                                      : null,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    )
+                        : Container(
+                      key: const ValueKey("placeholder"),
+                      height: 180.sp,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(16.sp),
+                        border: Border.all(color: Colors.grey[300]!),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        "Image preview will appear here",
+                        style: TextStyle(color: WebsiteColors.greyColor, fontSize: 26.sp),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () => Navigator.pop(context),
-            ),
-            TextButton(
-              child: const Text('Add'),
-              onPressed:
-                  () => Navigator.pop(context, urlController.text.trim()),
-            ),
-          ],
+
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: TextButton.styleFrom(
+                    foregroundColor: WebsiteColors.greyColor,
+                    textStyle: TextStyle(fontSize: 28.sp),
+                  ),
+                  child: const Text("Cancel"),
+                ),
+                ElevatedButton.icon(
+                  onPressed: isValidImage ? () => Navigator.pop(context, urlController.text.trim()) : null,
+                  icon: Icon(Icons.add_photo_alternate_outlined, size: 28.sp,color: WebsiteColors.whiteColor,),
+                  label: Text(
+                    "Add Image",
+                    style: TextStyle(fontSize: 28.sp, fontWeight: FontWeight.bold),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: WebsiteColors.primaryBlueColor,
+                    foregroundColor: WebsiteColors.whiteColor,
+                    disabledBackgroundColor: Colors.grey[400],
+                    padding: EdgeInsets.symmetric(horizontal: 28.sp, vertical: 18.sp),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14.sp),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -349,11 +458,23 @@ class _EditEventPageState extends State<EditEventPage> {
     }
   }
 
+
+
   Widget _buildImageGrid() {
     if (_imageUrls.isEmpty) return const SizedBox();
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Text(
+          "Uploaded Images",
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            fontSize: 36.sp,
+            color: WebsiteColors.primaryBlueColor,
+          ),
+        ),
+        SizedBox(height: 20.sp),
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -366,40 +487,92 @@ class _EditEventPageState extends State<EditEventPage> {
           ),
           itemBuilder: (context, index) {
             final url = _imageUrls[index];
-            return Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    url,
-                    width: double.infinity,
-                    height: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder:
-                        (_, __, ___) =>
-                            const Icon(Icons.broken_image, size: 40),
-                  ),
-                ),
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.black54,
-                      shape: BoxShape.circle,
-                    ),
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.delete,
-                        color: Colors.white,
-                        size: 20,
+
+            return Material(
+              elevation: 4,
+              borderRadius: BorderRadius.circular(12),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: url.startsWith('http')
+                          ? Image.network(
+                        url,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) =>
+                        const Icon(Icons.broken_image, size: 40),
+                      )
+                          : Image.file(
+                        File(url),
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) =>
+                        const Icon(Icons.broken_image, size: 40),
                       ),
-                      onPressed:
-                          () => setState(() => _imageUrls.removeAt(index)),
                     ),
-                  ),
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: InkWell(
+                        onTap: () async {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                backgroundColor: WebsiteColors.whiteColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                title: Row(
+                                  children:  [
+                                    Icon(Icons.warning_amber, color: WebsiteColors.darkBlueColor),
+                                    SizedBox(width: 10),
+                                    Text("Confirm Delete",style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: WebsiteColors.darkBlueColor,fontWeight: FontWeight.bold)),
+                                  ],
+                                ),
+                                content: const Text(
+                                  "Are you sure you want to delete this image?",
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(false),
+                                    child:  Text("Cancel",style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: WebsiteColors.blackColor)),
+                                  ),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: WebsiteColors.darkBlueColor,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(true),
+                                    child:  Text("Delete",style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: WebsiteColors.whiteColor)),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+
+                          if (confirm == true) {
+                            setState(() => _imageUrls.removeAt(index));
+                          }
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black45,
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          padding: const EdgeInsets.all(4),
+                          child: const Icon(Icons.delete, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             );
           },
         ),
@@ -407,6 +580,8 @@ class _EditEventPageState extends State<EditEventPage> {
       ],
     );
   }
+
+
 
   Widget _buildOnlineEventFields() {
     if (!_isOnlineEvent) return const SizedBox();
@@ -616,8 +791,9 @@ class _EditEventPageState extends State<EditEventPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Edit Event"),
+        title:  Text("Edit Event",style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: WebsiteColors.whiteColor),),
         backgroundColor: WebsiteColors.primaryBlueColor,
+        iconTheme:  IconThemeData(color: WebsiteColors.whiteColor),
       ),
       body: SafeArea(
         child: SingleChildScrollView(

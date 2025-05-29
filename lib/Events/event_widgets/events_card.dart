@@ -102,6 +102,7 @@ class _EventsCardState extends State<EventsCard> {
       },
       onTapCancel: () => setState(() => isClicked = false),
       child: AnimatedContainer(
+
         duration: const Duration(milliseconds: 300),
         curve: Curves.fastOutSlowIn,
         transform: isClicked ? (Matrix4.identity()..scale(1.04)) : Matrix4.identity(),
@@ -120,6 +121,7 @@ class _EventsCardState extends State<EventsCard> {
                     borderRadius: BorderRadius.circular(10.sp),
                     child: AspectRatio(
                       aspectRatio: 3 / 2,
+
                       child: _buildEventCardImage(),
                     ),
                   ),
