@@ -107,221 +107,236 @@ class _ProjectsState extends State<Projects>
   }
 
   Widget _buildProjectsGrid() {
-    return StreamBuilder<List<Project>>(
-      stream: _projectService.getProjects(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(
-              color: WebsiteColors.primaryBlueColor,
-            ),
-          );
-        }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final crossAxisCount =
+            constraints.maxWidth < 600
+                ? 2 // Small screens
+                : constraints.maxWidth < 900
+                ? 3 // Medium screens
+                : 4; // Large screens
 
-        if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        }
+        return StreamBuilder<List<Project>>(
+          stream: _projectService.getProjects(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(
+                  color: WebsiteColors.primaryBlueColor,
+                ),
+              );
+            }
 
-        final projects = snapshot.data ?? [];
-        if (projects.isEmpty) {
-          return const Center(
-            child: Text(
-              'No projects yet. Add your first project!',
-              style: TextStyle(fontSize: 18, color: WebsiteColors.greyColor),
-            ),
-          );
-        }
+            if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            }
 
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3, 
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio: 1, 
-            ),
-            itemCount: projects.length,
-            itemBuilder: (context, index) {
-              final project = projects[index];
-              return ProjectCard(
-                project: project,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder:
-                          (context) =>
-                              ProjectDetailsPage(projectId: project.id),
-                    ),
+            final projects = snapshot.data ?? [];
+            if (projects.isEmpty) {
+              return const Center(
+                child: Text(
+                  'No projects yet. Add your first project!',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: WebsiteColors.greyColor,
+                  ),
+                ),
+              );
+            }
+
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: 0.9, // Adjusted for better layout
+                ),
+                itemCount: projects.length,
+                itemBuilder: (context, index) {
+                  final project = projects[index];
+                  return ProjectCard(
+                    project: project,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  ProjectDetailsPage(projectId: project.id),
+                        ),
+                      );
+                    },
                   );
                 },
-              );
-            },
-          ),
+              ),
+            );
+          },
         );
       },
     );
   }
 
   Widget _buildManageProjectsTab() {
-    return StreamBuilder<List<Project>>(
-      stream: _projectService.getProjects(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(
-              color: WebsiteColors.primaryBlueColor,
-            ),
-          );
-        }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final crossAxisCount =
+            constraints.maxWidth < 600
+                ? 1 // Small screens
+                : constraints.maxWidth < 900
+                ? 2 // Medium screens
+                : 3; // Large screens
 
-        if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        }
+        return StreamBuilder<List<Project>>(
+          stream: _projectService.getProjects(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(
+                  color: WebsiteColors.primaryBlueColor,
+                ),
+              );
+            }
 
-        final projects = snapshot.data ?? [];
-        if (projects.isEmpty) {
-          return const Center(
-            child: Text(
-              'No projects to manage',
-              style: TextStyle(fontSize: 18, color: WebsiteColors.greyColor),
-            ),
-          );
-        }
+            if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            }
 
-        return ListView.builder(
-          padding: const EdgeInsets.all(16.0),
-          itemCount: projects.length,
-          itemBuilder: (context, index) {
-            final project = projects[index];
-            return Card(
-              color: WebsiteColors.whiteColor, // Set card background to white
-              margin: const EdgeInsets.only(bottom: 16.0),
-              elevation: 3,
-              child: ListTile(
-                contentPadding: const EdgeInsets.all(16.0),
-                leading:
-                    project.imageUrls != null && project.imageUrls!.isNotEmpty
-                        ? ClipRRect(
-                          borderRadius: BorderRadius.circular(8.0),
-                          child: Image.network(
-                            project.imageUrls!.first, // Use the first image URL
-                            width: 80, // Adjusted width for better presentation
-                            height:
-                                80, // Adjusted height for better presentation
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
+            final projects = snapshot.data ?? [];
+            if (projects.isEmpty) {
+              return const Center(
+                child: Text(
+                  'No projects to manage',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: WebsiteColors.greyColor,
+                  ),
+                ),
+              );
+            }
+
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: 2.5, // Adjusted for better layout
+                ),
+                itemCount: projects.length,
+                itemBuilder: (context, index) {
+                  final project = projects[index];
+                  return Card(
+                    color: WebsiteColors.whiteColor,
+                    margin: const EdgeInsets.only(bottom: 16.0),
+                    elevation: 3,
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.all(16.0),
+                      leading:
+                          project.imageUrls != null &&
+                                  project.imageUrls!.isNotEmpty
+                              ? ClipRRect(
+                                borderRadius: BorderRadius.circular(8.0),
+                                child: Image.network(
+                                  project.imageUrls!.first,
+                                  width: 80,
+                                  height: 80,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      width: 80,
+                                      height: 80,
+                                      color: WebsiteColors.whiteColor,
+                                      child: const Icon(
+                                        Icons.image_not_supported,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              )
+                              : Container(
                                 width: 80,
                                 height: 80,
-                                color: WebsiteColors.whiteColor,
-                                child: const Icon(Icons.image_not_supported),
-                              );
-                            },
-                          ),
-                        )
-                        : Container(
-                          width: 80, // Adjusted width for better presentation
-                          height: 80, // Adjusted height for better presentation
-                          decoration: BoxDecoration(
-                            color: WebsiteColors.whiteColor,
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: const Icon(
-                            Icons.image,
-                            color: WebsiteColors.primaryBlueColor,
-                          ),
-                        ),
-                title: Text(
-                  project.title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: WebsiteColors.darkBlueColor,
-                  ),
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      project.madeBy != null
-                          ? 'Made by: ${project.madeBy}'
-                          : 'Made by: N/A',
-                      style: const TextStyle(
-                        color: WebsiteColors.descGreyColor,
-                      ),
-                    ),
-                    Text(
-                      // ignore: unnecessary_null_comparison
-                      project.date != null
-                          ? 'Date: ${project.date.day}/${project.date.month}/${project.date.year}'
-                          : 'Date: N/A',
-                      style: const TextStyle(
-                        color: WebsiteColors.descGreyColor,
-                      ),
-                    ),
-                    Text(
-                      project.imageUrls != null && project.imageUrls!.isNotEmpty
-                          ? 'Image URL: ${project.imageUrls!.first}'
-                          : 'Image URL: N/A',
-                      style: const TextStyle(
-                        color: WebsiteColors.descGreyColor,
-                        fontSize: 12,
-                      ),
-                    ),
-                    Wrap(
-                      spacing: 4,
-                      children:
-                          project.tags.map((tag) {
-                            return Chip(
-                              label: Text(tag),
-                              backgroundColor: WebsiteColors.gradeintBlueColor,
-                              labelStyle: const TextStyle(
-                                color: WebsiteColors.primaryBlueColor,
-                                fontSize: 12,
+                                decoration: BoxDecoration(
+                                  color: WebsiteColors.whiteColor,
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: const Icon(
+                                  Icons.image,
+                                  color: WebsiteColors.primaryBlueColor,
+                                ),
                               ),
-                            );
-                          }).toList(),
-                    ),
-                  ],
-                ),
-                trailing: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 100),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(
-                          Icons.edit,
-                          color: WebsiteColors.primaryBlueColor,
+                      title: Text(
+                        project.title,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: WebsiteColors.darkBlueColor,
                         ),
-                        onPressed: () async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) =>
-                                      UpdateProjectPage(project: project),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            project.madeBy != null
+                                ? 'Made by: ${project.madeBy}'
+                                : 'Made by: N/A',
+                            style: const TextStyle(
+                              color: WebsiteColors.descGreyColor,
                             ),
-                          );
-                        },
+                          ),
+                          Text(
+                            project.date != null
+                                ? 'Date: ${project.date.day}/${project.date.month}/${project.date.year}'
+                                : 'Date: N/A',
+                            style: const TextStyle(
+                              color: WebsiteColors.descGreyColor,
+                            ),
+                          ),
+                        ],
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed:
-                            () => _showDeleteConfirmation(context, project),
+                      trailing: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 100),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                Icons.edit,
+                                color: WebsiteColors.primaryBlueColor,
+                              ),
+                              onPressed: () async {
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) =>
+                                            UpdateProjectPage(project: project),
+                                  ),
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed:
+                                  () =>
+                                      _showDeleteConfirmation(context, project),
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder:
-                          (context) =>
-                              ProjectDetailsPage(projectId: project.id),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) =>
+                                    ProjectDetailsPage(projectId: project.id),
+                          ),
+                        );
+                      },
                     ),
                   );
                 },
