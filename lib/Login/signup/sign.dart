@@ -184,7 +184,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               child: Padding(
                 padding: EdgeInsets.all(24.w),
                 child: SizedBox(
-                  height: 4000.h,
+                  height: 5000.h,
                   width: 900.w,
                   child: Form(
                     key: formKey,

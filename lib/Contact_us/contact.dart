@@ -129,320 +129,500 @@ class _ContactState extends State<Contact> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Container(
-        color: Colors.white,
-        child: Column(
-          children: [
-            // Top navigation bar
-            Container(
-              color: const Color(0xFF0066A0),
-              padding: EdgeInsets.symmetric(vertical: 16),
-              child: Center(
-                child: Text(
-                  'Contact Us - Admin',
+          ? Center(child: CircularProgressIndicator(color: Color(0xFF0066A0)))
+          : Column(
+        children: [
+          // Enhanced top navigation bar
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF0066A0), Color(0xFF004C7A)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+            child: Row(
+              children: [
+                Icon(Icons.contacts, color: Colors.white, size: 24),
+                SizedBox(width: 12),
+                Text(
+                  'Contact Management',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
                   ),
                 ),
-              ),
+              ],
             ),
+          ),
 
-            // Content area
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Header Information
-                      Text(
-                        'Header Information',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 16),
-
-                      // Header Title
-                      _buildLabeledField(
-                        label: 'Header Title',
-                        icon: Icons.title,
-                        child: _buildTextField(
+          // Enhanced content area
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header Information Card
+                    _buildSectionCard(
+                      title: 'Header Information',
+                      icon: Icons.dashboard_outlined,
+                      children: [
+                        _buildEnhancedField(
+                          label: 'Page Title',
+                          icon: Icons.title_outlined,
                           controller: _headerTitleController,
                           placeholder: 'Contact Us',
                         ),
-                      ),
-                      SizedBox(height: 12),
-
-                      // Header Description
-                      _buildLabeledField(
-                        label: 'Header Description',
-                        icon: Icons.description,
-                        child: _buildTextField(
+                        SizedBox(height: 20),
+                        _buildEnhancedField(
+                          label: 'Page Description',
+                          icon: Icons.description_outlined,
                           controller: _headerDescriptionController,
                           placeholder: 'Fill up the form and our Team will get back to you',
-                          maxLines: 2,
+                          maxLines: 3,
                         ),
-                      ),
-                      SizedBox(height: 24),
+                      ],
+                    ),
 
-                      // Contact Details
-                      Text(
-                        'Contact Details',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 16),
+                    SizedBox(height: 24),
 
-                      // Address
-                      _buildLabeledField(
-                        label: 'Address',
-                        icon: Icons.location_on,
-                        child: _buildTextField(
+                    // Contact Details Card
+                    _buildSectionCard(
+                      title: 'Contact Information',
+                      icon: Icons.location_on_outlined,
+                      children: [
+                        _buildEnhancedField(
+                          label: 'Business Address',
+                          icon: Icons.business_outlined,
                           controller: _addressController,
                           placeholder: 'Pharos University in Alexandria (PUA)',
+                          maxLines: 2,
                         ),
-                      ),
-                      SizedBox(height: 16),
+                      ],
+                    ),
 
-                      // Email Addresses
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(Icons.email, color: Color(0xFF0066A0), size: 20),
-                              SizedBox(width: 8),
-                              Text(
-                                'Email Addresses',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
+                    SizedBox(height: 24),
+
+                    // Email Addresses Card
+                    _buildSectionCard(
+                      title: 'Email Addresses',
+                      icon: Icons.email_outlined,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Manage contact emails',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
                               ),
-                            ],
-                          ),
-                          ElevatedButton.icon(
-                            onPressed: _addEmailField,
-                            icon: Icon(Icons.add, size: 16),
-                            label: Text("Add Email"),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF0066A0),
-                              foregroundColor: Colors.white,
-                              minimumSize: Size(30, 32),
-                              padding: EdgeInsets.symmetric(horizontal: 12),
-                              textStyle: TextStyle(fontSize: 13),
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 8),
-
-                      // Email fields
-                      ..._emailControllers.asMap().entries.map((entry) {
-                        int index = entry.key;
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Email ${index + 1}',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                ),
-                              ),
-                              SizedBox(width: 8),
-                              Expanded(
-                                child: _buildTextField(
-                                  controller: entry.value,
-                                  placeholder: 'example@email.com',
-                                ),
-                              ),
-                              SizedBox(width: 4),
-                              IconButton(
-                                icon: Icon(Icons.delete, color: Colors.red, size: 20),
-                                constraints: BoxConstraints(
-                                  minWidth: 32,
-                                  minHeight: 32,
-                                ),
-                                padding: EdgeInsets.zero,
-                                onPressed: () => _removeEmailField(index),
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                      SizedBox(height: 24),
-
-                      // Social Media Links
-                      Text(
-                        'Social Media Links',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                            _buildAddButton(
+                              onPressed: _addEmailField,
+                              label: 'Add Email',
+                              icon: Icons.add_circle_outline,
+                            ),
+                          ],
                         ),
-                      ),
-                      SizedBox(height: 16),
+                        SizedBox(height: 16),
+                        ..._emailControllers.asMap().entries.map((entry) {
+                          int index = entry.key;
+                          return _buildEmailField(index, entry.value);
+                        }).toList(),
+                      ],
+                    ),
 
-                      // Facebook
-                      _buildSocialMediaField(
-                        icon: Icons.facebook,
-                        label: 'Facebook',
-                        controller: _socialLinksControllers['facebook']!,
-                      ),
-                      SizedBox(height: 12),
+                    SizedBox(height: 24),
 
-                      // LinkedIn
-                      _buildSocialMediaField(
-                        icon: Icons.link,
-                        label: 'LinkedIn',
-                        controller: _socialLinksControllers['linkedin']!,
-                      ),
-                      SizedBox(height: 12),
+                    // Social Media Links Card
+                    _buildSectionCard(
+                      title: 'Social Media Links',
+                      icon: Icons.share_outlined,
+                      children: [
+                        _buildSocialField(
+                          icon: Icons.facebook_outlined,
+                          label: 'Facebook Page',
+                          controller: _socialLinksControllers['facebook']!,
+                          placeholder: 'https://facebook.com/yourpage',
+                        ),
+                        SizedBox(height: 16),
+                        _buildSocialField(
+                          icon: Icons.business_center_outlined,
+                          label: 'LinkedIn Profile',
+                          controller: _socialLinksControllers['linkedin']!,
+                          placeholder: 'https://linkedin.com/company/yourcompany',
+                        ),
+                        SizedBox(height: 16),
+                        _buildSocialField(
+                          icon: Icons.camera_alt_outlined,
+                          label: 'Instagram Account',
+                          controller: _socialLinksControllers['instagram']!,
+                          placeholder: 'https://instagram.com/youraccount',
+                        ),
+                      ],
+                    ),
 
-                      // Instagram
-                      _buildSocialMediaField(
-                        icon: Icons.camera_alt,
-                        label: 'Instagram',
-                        controller: _socialLinksControllers['instagram']!,
-                      ),
-                      SizedBox(height: 24),
+                    SizedBox(height: 32),
 
-                      // Save button
-                      Center(
+                    // Enhanced Save button
+                    Center(
+                      child: Container(
+                        width: double.infinity,
+                        constraints: BoxConstraints(maxWidth: 200),
                         child: ElevatedButton(
                           onPressed: _isSaving ? null : _saveContactContent,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xFF0066A0),
                             foregroundColor: Colors.white,
-                            minimumSize: Size(120, 40),
+                            elevation: 2,
+                            shadowColor: Color(0xFF0066A0).withOpacity(0.3),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4),
+                              borderRadius: BorderRadius.circular(8),
                             ),
+                            padding: EdgeInsets.symmetric(vertical: 16),
                           ),
                           child: _isSaving
                               ? Row(
-                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               SizedBox(
-                                width: 16,
-                                height: 16,
+                                width: 18,
+                                height: 18,
                                 child: CircularProgressIndicator(
                                   color: Colors.white,
                                   strokeWidth: 2,
                                 ),
                               ),
-                              SizedBox(width: 8),
-                              Text("Saving...")
+                              SizedBox(width: 12),
+                              Text(
+                                "Saving Changes...",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                             ],
                           )
-                              : Text("Save Changes"),
+                              : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.save_outlined, size: 18),
+                              SizedBox(width: 8),
+                              Text(
+                                "Save Changes",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      SizedBox(height: 20),
-                    ],
-                  ),
+                    ),
+                    SizedBox(height: 24),
+                  ],
                 ),
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionCard({
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
+        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF0066A0).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: Color(0xFF0066A0),
+                    size: 20,
+                  ),
+                ),
+                SizedBox(width: 12),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[800],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+            ...children,
           ],
         ),
       ),
     );
   }
 
-  Widget _buildLabeledField({
+  Widget _buildEnhancedField({
     required String label,
     required IconData icon,
-    required Widget child,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SizedBox(
-          width: 24,
-          child: Icon(icon, color: Color(0xFF0066A0), size: 20),
-        ),
-        SizedBox(width: 8),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-              SizedBox(height: 4),
-              child,
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTextField({
     required TextEditingController controller,
     required String placeholder,
     int maxLines = 1,
   }) {
-    return TextField(
-      controller: controller,
-      maxLines: maxLines,
-      style: TextStyle(fontSize: 14),
-      decoration: InputDecoration(
-        hintText: placeholder,
-        hintStyle: TextStyle(color: Colors.grey[400]),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(4),
-          borderSide: BorderSide(color: Colors.grey[300]!),
-        ),
-        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: maxLines > 1 ? 12 : 8),
-        isDense: true,
-      ),
-    );
-  }
-
-  Widget _buildSocialMediaField({
-    required IconData icon,
-    required String label,
-    required TextEditingController controller,
-  }) {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          width: 24,
-          child: Icon(icon, color: Color(0xFF0066A0), size: 20),
-        ),
-        SizedBox(width: 8),
-        Expanded(
-          child: TextField(
-            controller: controller,
-            style: TextStyle(fontSize: 14),
-            decoration: InputDecoration(
-              labelText: label,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
-                borderSide: BorderSide(color: Colors.grey[300]!),
+        Row(
+          children: [
+            Icon(icon, color: Color(0xFF0066A0), size: 16),
+            SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
+                color: Colors.grey[700],
               ),
-              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              isDense: true,
+            ),
+          ],
+        ),
+        SizedBox(height: 8),
+        TextField(
+          controller: controller,
+          maxLines: maxLines,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: Colors.grey[800],
+          ),
+          decoration: InputDecoration(
+            hintText: placeholder,
+            hintStyle: TextStyle(
+              color: Colors.grey[400],
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+            ),
+            filled: true,
+            fillColor: Colors.grey[50],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: Colors.grey[200]!),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: Colors.grey[200]!),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: Color(0xFF0066A0), width: 2),
+            ),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: maxLines > 1 ? 16 : 12,
             ),
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildEmailField(int index, TextEditingController controller) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey[200]!),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: Color(0xFF0066A0).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Center(
+              child: Text(
+                '${index + 1}',
+                style: TextStyle(
+                  color: Color(0xFF0066A0),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: 12),
+          Expanded(
+            child: TextField(
+              controller: controller,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: Colors.grey[800],
+              ),
+              decoration: InputDecoration(
+                hintText: 'example@email.com',
+                hintStyle: TextStyle(
+                  color: Colors.grey[400],
+                  fontSize: 13,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide: BorderSide(color: Colors.grey[300]!),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide: BorderSide(color: Colors.grey[300]!),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide: BorderSide(color: Color(0xFF0066A0)),
+                ),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                isDense: true,
+              ),
+            ),
+          ),
+          SizedBox(width: 8),
+          IconButton(
+            icon: Icon(Icons.delete_outline, color: Colors.red[400], size: 18),
+            constraints: BoxConstraints(minWidth: 36, minHeight: 36),
+            padding: EdgeInsets.zero,
+            onPressed: () => _removeEmailField(index),
+            tooltip: 'Remove email',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSocialField({
+    required IconData icon,
+    required String label,
+    required TextEditingController controller,
+    required String placeholder,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, color: Color(0xFF0066A0), size: 16),
+            SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
+                color: Colors.grey[700],
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 8),
+        TextField(
+          controller: controller,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w400,
+            color: Colors.grey[800],
+          ),
+          decoration: InputDecoration(
+            hintText: placeholder,
+            hintStyle: TextStyle(
+              color: Colors.grey[400],
+              fontSize: 12,
+            ),
+            filled: true,
+            fillColor: Colors.grey[50],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: Colors.grey[200]!),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: Colors.grey[200]!),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: Color(0xFF0066A0), width: 2),
+            ),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAddButton({
+    required VoidCallback onPressed,
+    required String label,
+    required IconData icon,
+  }) {
+    return TextButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, size: 16, color: Color(0xFF0066A0)),
+      label: Text(
+        label,
+        style: TextStyle(
+          color: Color(0xFF0066A0),
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      style: TextButton.styleFrom(
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(6),
+          side: BorderSide(color: Color(0xFF0066A0).withOpacity(0.3)),
+        ),
+      ),
     );
   }
 }
