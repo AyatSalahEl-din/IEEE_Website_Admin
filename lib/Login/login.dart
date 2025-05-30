@@ -1,17 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ieee_website/Base/base.dart';
-import 'package:ieee_website/Home_screen/home_screen.dart';
 import 'package:ieee_website/Login/auth/custom_text_form_field.dart';
 import 'package:ieee_website/Login/auth/dialog_utils.dart';
 import 'package:ieee_website/Login/signup/sign.dart';
 import 'package:ieee_website/Themes/website_colors.dart';
-import 'dart:convert';
-import 'package:crypto/crypto.dart';
 import 'package:ieee_website/utils/shared_prefs_helper.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -22,13 +17,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController nameController = TextEditingController(
-    text: 'ayat.salah.eldin@gmail.com',
-  );
+  final TextEditingController nameController = TextEditingController();
 
-  final TextEditingController passController = TextEditingController(
-    text: 'ayt261',
-  );
+  final TextEditingController passController = TextEditingController();
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
