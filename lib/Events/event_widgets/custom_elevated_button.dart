@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../Themes/website_colors.dart';
 
 class CustomElevatedButton extends StatelessWidget {
@@ -26,32 +25,50 @@ class CustomElevatedButton extends StatelessWidget {
         child: ElevatedButton(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: isActive ? WebsiteColors.primaryBlueColor : WebsiteColors.greyColor.withOpacity(0.2),
-            foregroundColor: isActive ? WebsiteColors.whiteColor : WebsiteColors.darkBlueColor,
+            backgroundColor:
+                isActive
+                    ? WebsiteColors.primaryBlueColor
+                    : WebsiteColors.greyColor.withOpacity(0.2),
+            foregroundColor:
+                isActive
+                    ? WebsiteColors.whiteColor
+                    : WebsiteColors.darkBlueColor,
             padding: EdgeInsets.symmetric(
-              horizontal: isSmallScreen ? 30.sp : 35.sp,
-              vertical: isSmallScreen ? 25.sp : 28.sp,
+              horizontal: isSmallScreen ? 30 : 35,
+              vertical: isSmallScreen ? 25 : 28,
             ),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.sp),
+              borderRadius: BorderRadius.circular(12),
               side: BorderSide(
-                color: isActive ? WebsiteColors.primaryBlueColor : Colors.transparent,
-                width: isActive ? 2.sp : 0,
+                color:
+                    isActive
+                        ? WebsiteColors.primaryBlueColor
+                        : Colors.transparent,
+                width: isActive ? 2 : 0,
               ),
             ),
             elevation: isActive ? 6 : 2,
-            shadowColor: isActive ? WebsiteColors.primaryBlueColor.withOpacity(0.4) : Colors.grey.withOpacity(0.3),
+            shadowColor:
+                isActive
+                    ? WebsiteColors.primaryBlueColor.withOpacity(0.4)
+                    : Colors.grey.withOpacity(0.3),
             textStyle: TextStyle(
-              fontSize: isSmallScreen ? 18.sp : 20.sp,
+              fontSize: isSmallScreen ? 18 : 20,
               fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
             ),
-            minimumSize: Size(isSmallScreen ? 120.sp : 140.sp, isSmallScreen ? 44.sp : 48.sp),
+            minimumSize: Size(
+              isSmallScreen ? 120 : 140,
+              isSmallScreen ? 44 : 48,
+            ),
           ),
           child: Text(
             label,
             style: TextStyle(
-              color: isActive ? WebsiteColors.whiteColor : WebsiteColors.darkBlueColor,
-              fontSize: isSmallScreen ? 18.sp : 20.sp,
+              color:
+                  isActive
+                      ? WebsiteColors.whiteColor
+                      : WebsiteColors.darkBlueColor,
+              fontSize: isSmallScreen ? 18 : 20,
             ),
           ),
         ),

@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'Date_picker_tile.dart';
 import 'custom_text_form_field.dart';
@@ -311,20 +310,20 @@ class _EditEventPageState extends State<EditEventPage> {
             return AlertDialog(
               backgroundColor: WebsiteColors.whiteColor,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24.sp),
+                borderRadius: BorderRadius.circular(24),
               ),
-              titlePadding: EdgeInsets.only(top: 28.sp, left: 24.sp, right: 24.sp),
-              contentPadding: EdgeInsets.symmetric(horizontal: 24.sp, vertical: 12.sp),
-              actionsPadding: EdgeInsets.symmetric(horizontal: 20.sp, vertical: 20.sp),
+              titlePadding: EdgeInsets.only(top: 28, left: 24, right: 24),
+              contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              actionsPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
 
               title: Row(
                 children: [
-                  Icon(Icons.image_outlined, size: 36.sp, color: WebsiteColors.whiteColor),
-                  SizedBox(width: 12.sp),
+                  Icon(Icons.image_outlined, size: 36, color: WebsiteColors.whiteColor),
+                  SizedBox(width: 12),
                   Text(
                     "Add Image URL",
                     style: TextStyle(
-                      fontSize: 36.sp,
+                      fontSize: 36,
                       fontWeight: FontWeight.bold,
                       color: WebsiteColors.primaryBlueColor,
                     ),
@@ -346,33 +345,33 @@ class _EditEventPageState extends State<EditEventPage> {
                     },
                     decoration: InputDecoration(
                       hintText: "Paste image URL here...",
-                      hintStyle: TextStyle(fontSize: 28.sp, color: WebsiteColors.greyColor),
+                      hintStyle: TextStyle(fontSize: 28, color: WebsiteColors.greyColor),
                       prefixIcon: Icon(Icons.link, color: WebsiteColors.greyColor),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 22.sp),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 22),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14.sp),
+                        borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide(color: WebsiteColors.primaryBlueColor),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14.sp),
+                        borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide(color: WebsiteColors.primaryBlueColor, width: 1.5),
                       ),
                     ),
                   ),
-                  SizedBox(height: 24.sp),
+                  SizedBox(height: 24),
 
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
                     child: imageUrl != null && imageUrl!.isNotEmpty
                         ? ClipRRect(
                       key: ValueKey(imageUrl),
-                      borderRadius: BorderRadius.circular(16.sp),
+                      borderRadius: BorderRadius.circular(16),
                       child: Container(
                         decoration: BoxDecoration(
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black12,
-                              blurRadius: 12.sp,
+                              blurRadius: 12,
                               spreadRadius: 1,
                               offset: const Offset(0, 3),
                             )
@@ -386,7 +385,7 @@ class _EditEventPageState extends State<EditEventPage> {
                             errorBuilder: (_, __, ___) => Container(
                               color: Colors.grey[200],
                               alignment: Alignment.center,
-                              child: Icon(Icons.broken_image, size: 48.sp, color: Colors.grey),
+                              child: Icon(Icons.broken_image, size: 48, color: Colors.grey),
                             ),
                             loadingBuilder: (_, child, progress) {
                               if (progress == null) return child;
@@ -404,16 +403,16 @@ class _EditEventPageState extends State<EditEventPage> {
                     )
                         : Container(
                       key: const ValueKey("placeholder"),
-                      height: 180.sp,
+                      height: 180,
                       decoration: BoxDecoration(
                         color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(16.sp),
+                        borderRadius: BorderRadius.circular(16),
                         border: Border.all(color: Colors.grey[300]!),
                       ),
                       alignment: Alignment.center,
                       child: Text(
                         "Image preview will appear here",
-                        style: TextStyle(color: WebsiteColors.greyColor, fontSize: 26.sp),
+                        style: TextStyle(color: WebsiteColors.greyColor, fontSize: 26),
                       ),
                     ),
                   ),
@@ -425,24 +424,24 @@ class _EditEventPageState extends State<EditEventPage> {
                   onPressed: () => Navigator.pop(context),
                   style: TextButton.styleFrom(
                     foregroundColor: WebsiteColors.greyColor,
-                    textStyle: TextStyle(fontSize: 28.sp),
+                    textStyle: TextStyle(fontSize: 28),
                   ),
                   child: const Text("Cancel"),
                 ),
                 ElevatedButton.icon(
                   onPressed: isValidImage ? () => Navigator.pop(context, urlController.text.trim()) : null,
-                  icon: Icon(Icons.add_photo_alternate_outlined, size: 28.sp,color: WebsiteColors.whiteColor,),
+                  icon: Icon(Icons.add_photo_alternate_outlined, size: 28,color: WebsiteColors.whiteColor,),
                   label: Text(
                     "Add Image",
-                    style: TextStyle(fontSize: 28.sp, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: WebsiteColors.primaryBlueColor,
                     foregroundColor: WebsiteColors.whiteColor,
                     disabledBackgroundColor: Colors.grey[400],
-                    padding: EdgeInsets.symmetric(horizontal: 28.sp, vertical: 18.sp),
+                    padding: EdgeInsets.symmetric(horizontal: 28, vertical: 18),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14.sp),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                   ),
                 ),
@@ -470,11 +469,11 @@ class _EditEventPageState extends State<EditEventPage> {
           "Uploaded Images",
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
-            fontSize: 36.sp,
+            fontSize: 36,
             color: WebsiteColors.primaryBlueColor,
           ),
         ),
-        SizedBox(height: 20.sp),
+        SizedBox(height: 20),
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -576,7 +575,7 @@ class _EditEventPageState extends State<EditEventPage> {
             );
           },
         ),
-        SizedBox(height: 20.sp),
+        SizedBox(height: 20),
       ],
     );
   }
@@ -596,14 +595,14 @@ class _EditEventPageState extends State<EditEventPage> {
           validator:
               (value) => value?.isEmpty ?? true ? 'Enter exact time' : null,
         ),
-        SizedBox(height: 20.sp),
+        SizedBox(height: 20),
         CustomTextFormField(
           controller: _appUrlController,
           labelText: 'Pre-URL (Optional)',
           icon: Icons.link,
           keyboardType: TextInputType.text,
         ),
-        SizedBox(height: 20.sp),
+        SizedBox(height: 20),
         DropdownButtonFormField<String>(
           value: _selectedApp,
           items:
@@ -618,7 +617,7 @@ class _EditEventPageState extends State<EditEventPage> {
           validator: (value) => value == null ? 'Select an app' : null,
         ),
         if (_selectedApp == 'Other') ...[
-          SizedBox(height: 20.sp),
+          SizedBox(height: 20),
           CustomTextFormField(
             controller: _appNameController,
             labelText: 'App Name',
@@ -628,7 +627,7 @@ class _EditEventPageState extends State<EditEventPage> {
                 (value) => value?.isEmpty ?? true ? 'Enter app name' : null,
           ),
         ],
-        SizedBox(height: 20.sp),
+        SizedBox(height: 20),
       ],
     );
   }
@@ -665,7 +664,7 @@ class _EditEventPageState extends State<EditEventPage> {
                   (value) =>
                       value?.isEmpty ?? true ? 'Enter ticket limit' : null,
             ),
-          SizedBox(height: 20.sp),
+          SizedBox(height: 20),
           CustomTextFormField(
             controller: _ticketPriceController,
             labelText: 'Ticket Price',
@@ -674,7 +673,7 @@ class _EditEventPageState extends State<EditEventPage> {
             validator:
                 (value) => value?.isEmpty ?? true ? 'Enter ticket price' : null,
           ),
-          SizedBox(height: 20.sp),
+          SizedBox(height: 20),
           CustomTextFormField(
             controller: _discountController,
             labelText: 'Discount',
@@ -683,7 +682,7 @@ class _EditEventPageState extends State<EditEventPage> {
             validator:
                 (value) => value?.isEmpty ?? true ? 'Enter discount' : null,
           ),
-          SizedBox(height: 20.sp),
+          SizedBox(height: 20),
           CustomTextFormField(
             controller: _discountForController,
             labelText: 'Discount For',
@@ -692,7 +691,7 @@ class _EditEventPageState extends State<EditEventPage> {
             validator:
                 (value) => value?.isEmpty ?? true ? 'Enter discount for' : null,
           ),
-          SizedBox(height: 20.sp),
+          SizedBox(height: 20),
           SwitchListTile(
             title: const Text('Is Bus Available?'),
             value: _isBusAvailable,
@@ -716,7 +715,7 @@ class _EditEventPageState extends State<EditEventPage> {
               (value) =>
                   value?.isEmpty ?? true ? 'Enter number of buses' : null,
         ),
-        SizedBox(height: 20.sp),
+        SizedBox(height: 20),
         CustomTextFormField(
           controller: _seatsPerBusController,
           labelText: 'Seats Per Bus',
@@ -725,7 +724,7 @@ class _EditEventPageState extends State<EditEventPage> {
           validator:
               (value) => value?.isEmpty ?? true ? 'Enter seats per bus' : null,
         ),
-        SizedBox(height: 20.sp),
+        SizedBox(height: 20),
         CustomTextFormField(
           controller: _busTicketPriceController,
           labelText: 'Bus Ticket Price',
@@ -735,7 +734,7 @@ class _EditEventPageState extends State<EditEventPage> {
               (value) =>
                   value?.isEmpty ?? true ? 'Enter bus ticket price' : null,
         ),
-        SizedBox(height: 20.sp),
+        SizedBox(height: 20),
         CustomTextFormField(
           controller: _busSourceController,
           labelText: 'Bus Source',
@@ -744,7 +743,7 @@ class _EditEventPageState extends State<EditEventPage> {
           validator:
               (value) => value?.isEmpty ?? true ? 'Enter bus source' : null,
         ),
-        SizedBox(height: 20.sp),
+        SizedBox(height: 20),
         CustomTextFormField(
           controller: _busDestinationController,
           labelText: 'Bus Destination',
@@ -754,7 +753,7 @@ class _EditEventPageState extends State<EditEventPage> {
               (value) =>
                   value?.isEmpty ?? true ? 'Enter bus destination' : null,
         ),
-        SizedBox(height: 20.sp),
+        SizedBox(height: 20),
         CustomTextFormField(
           controller: _busDepartureTimeController,
           labelText: 'Bus Departure Time',
@@ -763,7 +762,7 @@ class _EditEventPageState extends State<EditEventPage> {
           validator:
               (value) => value?.isEmpty ?? true ? 'Enter departure time' : null,
         ),
-        SizedBox(height: 20.sp),
+        SizedBox(height: 20),
         CustomTextFormField(
           controller: _busArrivalTimeController,
           labelText: 'Bus Arrival Time',
@@ -772,7 +771,7 @@ class _EditEventPageState extends State<EditEventPage> {
           validator:
               (value) => value?.isEmpty ?? true ? 'Enter arrival time' : null,
         ),
-        SizedBox(height: 20.sp),
+        SizedBox(height: 20),
         CustomTextFormField(
           controller: _tripExplanationController,
           labelText: 'Program Details',
@@ -782,7 +781,7 @@ class _EditEventPageState extends State<EditEventPage> {
               (value) =>
                   value?.isEmpty ?? true ? 'Enter program details' : null,
         ),
-        SizedBox(height: 20.sp),
+        SizedBox(height: 20),
       ],
     );
   }
@@ -797,12 +796,12 @@ class _EditEventPageState extends State<EditEventPage> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(20.sp),
+          padding: EdgeInsets.all(20),
           child: Form(
             key: _formKey,
             child: Column(
               children: [
-                SizedBox(height: 25.sp),
+                SizedBox(height: 25),
                 CustomTextFormField(
                   controller: _nameController,
                   labelText: "Event Name",
@@ -812,7 +811,7 @@ class _EditEventPageState extends State<EditEventPage> {
                       (value) =>
                           value?.isEmpty ?? true ? 'Enter event name' : null,
                 ),
-                SizedBox(height: 20.sp),
+                SizedBox(height: 20),
                 CustomTextFormField(
                   controller: _categoryController,
                   labelText: "Category",
@@ -822,7 +821,7 @@ class _EditEventPageState extends State<EditEventPage> {
                       (value) =>
                           value?.isEmpty ?? true ? 'Enter category' : null,
                 ),
-                SizedBox(height: 20.sp),
+                SizedBox(height: 20),
                 CustomTextFormField(
                   controller: _descriptionController,
                   labelText: "Description",
@@ -833,7 +832,7 @@ class _EditEventPageState extends State<EditEventPage> {
                       (value) =>
                           value?.isEmpty ?? true ? 'Enter description' : null,
                 ),
-                SizedBox(height: 20.sp),
+                SizedBox(height: 20),
                 CustomTextFormField(
                   controller: _locationController,
                   labelText: "Location",
@@ -843,7 +842,7 @@ class _EditEventPageState extends State<EditEventPage> {
                       (value) =>
                           value?.isEmpty ?? true ? 'Enter location' : null,
                 ),
-                SizedBox(height: 20.sp),
+                SizedBox(height: 20),
                 CustomTextFormField(
                   controller: _timeController,
                   labelText: "Time",
@@ -852,20 +851,20 @@ class _EditEventPageState extends State<EditEventPage> {
                   validator:
                       (value) => value?.isEmpty ?? true ? 'Enter time' : null,
                 ),
-                SizedBox(height: 20.sp),
+                SizedBox(height: 20),
                 CustomDatePicker(
                   initialDate: _selectedDate,
                   onDatePicked:
                       (newDateTime) =>
                           setState(() => _selectedDate = newDateTime),
                 ),
-                SizedBox(height: 20.sp),
+                SizedBox(height: 20),
                 _buildImageGrid(),
                 CustomElevatedButton(
                   label: '+ Add Image',
                   onPressed: _addImage,
                 ),
-                SizedBox(height: 20.sp),
+                SizedBox(height: 20),
                 SwitchListTile(
                   title: const Text('Is Online Event?'),
                   value: _isOnlineEvent,
@@ -891,7 +890,7 @@ class _EditEventPageState extends State<EditEventPage> {
                               ? 'Enter contact number'
                               : null,
                 ),
-                SizedBox(height: 20.sp),
+                SizedBox(height: 20),
                 CustomTextFormField(
                   controller: _contactEmailController,
                   labelText: 'Contact Email',
@@ -901,12 +900,12 @@ class _EditEventPageState extends State<EditEventPage> {
                       (value) =>
                           value?.isEmpty ?? true ? 'Enter contact email' : null,
                 ),
-                SizedBox(height: 30.sp),
+                SizedBox(height: 30),
                 CustomElevatedButton(
                   label: 'Update Event',
                   onPressed: _updateEvent,
                 ),
-                SizedBox(height: 20.sp),
+                SizedBox(height: 20),
               ],
             ),
           ),

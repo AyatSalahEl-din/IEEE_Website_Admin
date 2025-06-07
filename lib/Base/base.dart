@@ -103,13 +103,14 @@ class _BaseState extends State<Base> with SingleTickerProviderStateMixin {
       endDrawer:
           MediaQuery.of(context).size.width < 900
               ? Drawer(
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  children: <Widget>[
+                child: Container(
+                  color: WebsiteColors.whiteColor,
+                  child: ListView(
+                    padding: EdgeInsets.zero,
+                    children: <Widget>[
                     DrawerHeader(
                       decoration: BoxDecoration(
-                        color: WebsiteColors.primaryBlueColor,
-                      ),
+                        color: WebsiteColors.primaryBlueColor,),
                       child: Text(
                         'Tabs',
                         style: TextStyle(
@@ -163,7 +164,7 @@ class _BaseState extends State<Base> with SingleTickerProviderStateMixin {
                     ),
                   ],
                 ),
-              )
+              ))
               : null, // No drawer for large screens
       body: TabBarView(
         controller: _tabController,

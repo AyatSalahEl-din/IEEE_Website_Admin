@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ieee_website/Themes/website_colors.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -32,7 +31,7 @@ class _ManageProposalsWidgetState extends State<ManageProposalsWidget> {
             children: [
               // Search and Filter Row
               Padding(
-                padding: EdgeInsets.all(16.sp),
+                padding: EdgeInsets.all(16),
                 child: Row(
                   children: [
                     Expanded(
@@ -42,10 +41,10 @@ class _ManageProposalsWidgetState extends State<ManageProposalsWidget> {
                           hintText: 'Search proposals...',
                           hintStyle: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(color: WebsiteColors.greyColor),
-                          prefixIcon: Icon(Icons.search, size: 30.sp),
+                          prefixIcon: Icon(Icons.search, size: 30),
                           filled: true,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.sp),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
                           ),
                         ),
@@ -55,38 +54,38 @@ class _ManageProposalsWidgetState extends State<ManageProposalsWidget> {
                             ),
                       ),
                     ),
-                    SizedBox(width: 10.sp),
+                    SizedBox(width: 10),
                     DropdownButton<String>(
                       value: _selectedStatus,
                       dropdownColor: Colors.white,
                       style: TextStyle(
-                        fontSize: 25.sp,
+                        fontSize: 25,
                         color: WebsiteColors.darkBlueColor,
                       ),
                       items: [
                         DropdownMenuItem(
                           value: 'All',
-                          child: Text('All', style: TextStyle(fontSize: 25.sp)),
+                          child: Text('All', style: TextStyle(fontSize: 25)),
                         ),
                         DropdownMenuItem(
                           value: 'pending',
                           child: Text(
                             'Pending',
-                            style: TextStyle(fontSize: 25.sp),
+                            style: TextStyle(fontSize: 25),
                           ),
                         ),
                         DropdownMenuItem(
                           value: 'approved',
                           child: Text(
                             'Approved',
-                            style: TextStyle(fontSize: 25.sp),
+                            style: TextStyle(fontSize: 25),
                           ),
                         ),
                         DropdownMenuItem(
                           value: 'rejected',
                           child: Text(
                             'Rejected',
-                            style: TextStyle(fontSize: 25.sp),
+                            style: TextStyle(fontSize: 25),
                           ),
                         ),
                       ],
@@ -131,7 +130,7 @@ class _ManageProposalsWidgetState extends State<ManageProposalsWidget> {
           return Center(
             child: Text(
               "No proposals found.",
-              style: TextStyle(fontSize: 30.sp),
+              style: TextStyle(fontSize: 30),
             ),
           );
         }
@@ -160,7 +159,7 @@ class _ManageProposalsWidgetState extends State<ManageProposalsWidget> {
           return Center(
             child: Text(
               "No matching proposals found.",
-              style: TextStyle(fontSize: 30.sp),
+              style: TextStyle(fontSize: 30),
             ),
           );
         }
@@ -168,12 +167,12 @@ class _ManageProposalsWidgetState extends State<ManageProposalsWidget> {
         final crossAxisCount = (constraints.maxWidth / 350).floor().clamp(1, 3);
 
         return GridView.builder(
-          padding: EdgeInsets.all(8.sp),
+          padding: EdgeInsets.all(8),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
-            crossAxisSpacing: 8.sp,
-            mainAxisSpacing: 8.sp,
-            childAspectRatio: 1.2,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
+            childAspectRatio: 1,
           ),
           itemCount: filteredProposals.length,
           itemBuilder: (context, index) {
@@ -200,10 +199,10 @@ class _ManageProposalsWidgetState extends State<ManageProposalsWidget> {
     return Card(
       color: Colors.white,
       elevation: 2,
-      margin: EdgeInsets.all(4.sp),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
+      margin: EdgeInsets.all(4),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: Padding(
-        padding: EdgeInsets.all(10.sp),
+        padding: EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -212,7 +211,7 @@ class _ManageProposalsWidgetState extends State<ManageProposalsWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 IconButton(
-                  icon: Icon(Icons.delete, size: 22.sp),
+                  icon: Icon(Icons.delete, size: 22),
                   color: Colors.red,
                   padding: EdgeInsets.zero,
                   constraints: BoxConstraints(),
@@ -220,17 +219,17 @@ class _ManageProposalsWidgetState extends State<ManageProposalsWidget> {
                 ),
                 Container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: 10.sp,
-                    vertical: 6.sp,
+                    horizontal: 10,
+                    vertical: 6,
                   ),
                   decoration: BoxDecoration(
                     color: _getStatusColor(data['status']),
-                    borderRadius: BorderRadius.circular(8.sp),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     (data['status'] ?? 'pending').toString().toUpperCase(),
                     style: TextStyle(
-                      fontSize: 16.sp,
+                      fontSize: 16,
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
@@ -238,65 +237,65 @@ class _ManageProposalsWidgetState extends State<ManageProposalsWidget> {
                 ),
               ],
             ),
-            SizedBox(height: 8.sp),
+            SizedBox(height: 8),
 
             // Event name
             Text(
               data['eventName'] ?? 'No Event Name',
               style: TextStyle(
-                fontSize: 20.sp,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: WebsiteColors.primaryBlueColor,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            SizedBox(height: 10.sp),
+            SizedBox(height: 10),
 
             // Organizer details
             _buildDetailRow(
               Icons.person_outline,
               data['organizerName'] ?? 'No Organizer',
-              fontSize: 18.sp,
+              fontSize: 18,
             ),
             _buildDetailRow(
               Icons.phone_iphone,
               data['phone'] ?? 'No Phone',
               isPhone: true,
               phoneData: data,
-              fontSize: 18.sp,
+              fontSize: 18,
             ),
             _buildDetailRow(
               Icons.email_outlined,
               data['email'] ?? 'No Email',
-              fontSize: 18.sp,
+              fontSize: 18,
             ),
-            SizedBox(height: 10.sp),
+            SizedBox(height: 10),
 
             // Event details
             _buildDetailRow(
               Icons.calendar_month,
               DateFormat('MMM dd, yyyy').format(proposedDate),
-              fontSize: 18.sp,
+              fontSize: 18,
             ),
             _buildDetailRow(
               Icons.location_on,
               isOnline
                   ? 'Online Event'
                   : data['proposedLocation'] ?? 'No Location',
-              fontSize: 18.sp,
+              fontSize: 18,
             ),
             _buildDetailRow(
               Icons.people,
               'Expected: ${data['expectedAttendees'] ?? 'N/A'} attendees',
-              fontSize: 18.sp,
+              fontSize: 18,
             ),
-            SizedBox(height: 10.sp),
+            SizedBox(height: 10),
 
             // Description preview
             Text(
               data['eventDescription'] ?? 'No description provided',
-              style: TextStyle(fontSize: 16.sp, color: Colors.grey[700]),
+              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -319,7 +318,7 @@ class _ManageProposalsWidgetState extends State<ManageProposalsWidget> {
                     ),
                   ),
                 ),
-                SizedBox(width: 4.sp),
+                SizedBox(width: 4),
                 Expanded(
                   child: _buildActionButton(
                     'REJECT',
@@ -350,17 +349,17 @@ class _ManageProposalsWidgetState extends State<ManageProposalsWidget> {
     double fontSize =20,
   }) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 2.sp),
+      padding: EdgeInsets.symmetric(vertical: 2),
       child: InkWell(
         onTap: isPhone ? () => _launchWhatsAppForDetails(phoneData!) : null,
         child: Row(
           children: [
             Icon(
               icon,
-              size: 20.sp,
+              size: 20,
               color: isPhone ? Colors.green : WebsiteColors.primaryBlueColor,
             ),
-            SizedBox(width: 6.sp),
+            SizedBox(width: 6),
             Expanded(
               child: Text(
                 text,
@@ -383,15 +382,15 @@ class _ManageProposalsWidgetState extends State<ManageProposalsWidget> {
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4.sp),
+          borderRadius: BorderRadius.circular(4),
         ),
-        padding: EdgeInsets.symmetric(vertical: 4.sp),
-        minimumSize: Size(0, 28.sp),
+        padding: EdgeInsets.symmetric(vertical: 4),
+        minimumSize: Size(0, 28),
       ),
       child: Text(
         text,
         style: TextStyle(
-          fontSize: 12.sp,
+          fontSize: 12,
           color: Colors.white,
           fontWeight: FontWeight.bold,
         ),
