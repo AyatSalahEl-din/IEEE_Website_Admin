@@ -52,8 +52,6 @@ class DialogUtils {
           style: ElevatedButton.styleFrom(
             backgroundColor: WebsiteColors.gradeintBlueColor,
             foregroundColor: WebsiteColors.primaryBlueColor,
-
-            //minimumSize: Size(200.w, 350.h),
           ),
           onPressed: () {
             Navigator.pop(context);
@@ -76,8 +74,6 @@ class DialogUtils {
           style: ElevatedButton.styleFrom(
             backgroundColor: WebsiteColors.gradeintBlueColor,
             foregroundColor: WebsiteColors.primaryBlueColor,
-
-            //minimumSize: Size(200.w, 350.h),
           ),
           onPressed: () {
             Navigator.pop(context);
