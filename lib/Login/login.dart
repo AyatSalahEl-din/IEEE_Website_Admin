@@ -51,9 +51,9 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               color: WebsiteColors.gradeintBlueColor,
               child: Padding(
-                padding: EdgeInsets.all(24.w),
+                padding: EdgeInsets.all(30.w),
                 child: SizedBox(
-                  height: 3100.h,
+                  height: 3800.h,
                   width: 900.w,
                   child: Form(
                     key: formKey,
