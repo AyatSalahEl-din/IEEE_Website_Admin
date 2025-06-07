@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ieee_website/Projects/models/project_model.dart';
 import 'package:ieee_website/Projects/services/project_service.dart';
 import 'package:ieee_website/Themes/website_colors.dart';

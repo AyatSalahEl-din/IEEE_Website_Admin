@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../Themes/website_colors.dart';
 import 'Date_picker_tile.dart';
 import 'custom_text_form_field.dart';
@@ -138,20 +137,22 @@ class _AddEventFormState extends State<AddEventForm> {
             icon: Icons.event,
             keyboardType: TextInputType.text,
             onChanged: (value) {},
-            validator: (value) =>
-            value == null || value.isEmpty ? 'Enter event name' : null,
+            validator:
+                (value) =>
+                    value == null || value.isEmpty ? 'Enter event name' : null,
           ),
-          SizedBox(height: 30.sp),
+          SizedBox(height: 30),
           CustomTextFormField(
             controller: widget.categoryController,
             labelText: 'Category',
             icon: Icons.category_outlined,
             keyboardType: TextInputType.text,
             onChanged: (value) {},
-            validator: (value) =>
-            value == null || value.isEmpty ? 'Enter category' : null,
+            validator:
+                (value) =>
+                    value == null || value.isEmpty ? 'Enter category' : null,
           ),
-          SizedBox(height: 30.sp),
+          SizedBox(height: 30),
           CustomTextFormField(
             controller: widget.descriptionController,
             labelText: 'Description',
@@ -159,10 +160,11 @@ class _AddEventFormState extends State<AddEventForm> {
             isMultiline: true,
             keyboardType: TextInputType.multiline,
             onChanged: (value) {},
-            validator: (value) =>
-            value == null || value.isEmpty ? 'Enter description' : null,
+            validator:
+                (value) =>
+                    value == null || value.isEmpty ? 'Enter description' : null,
           ),
-          SizedBox(height: 30.sp),
+          SizedBox(height: 30),
           CustomTextFormField(
             controller: widget.imageUrlController,
             labelText: 'Image URL',
@@ -170,7 +172,7 @@ class _AddEventFormState extends State<AddEventForm> {
             keyboardType: TextInputType.url,
             onChanged: (value) {},
           ),
-          SizedBox(height: 60.sp),
+          SizedBox(height: 60),
           ElevatedButton.icon(
             onPressed: () {
               final url = widget.imageUrlController.text.trim();
@@ -181,12 +183,16 @@ class _AddEventFormState extends State<AddEventForm> {
                 });
               }
             },
-            icon: const Icon(Icons.add, color: WebsiteColors.whiteColor, size: 28),
+            icon: const Icon(
+              Icons.add,
+              color: WebsiteColors.whiteColor,
+              size: 28,
+            ),
             label: Text(
               'Add Image URL',
               style: TextStyle(
                 color: WebsiteColors.whiteColor,
-                fontSize: 20.sp,
+                fontSize: 20,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -194,14 +200,14 @@ class _AddEventFormState extends State<AddEventForm> {
               backgroundColor: WebsiteColors.primaryBlueColor,
               foregroundColor: WebsiteColors.whiteColor,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.sp),
+                borderRadius: BorderRadius.circular(16),
               ),
-              padding: EdgeInsets.symmetric(vertical: 16.sp, horizontal: 20.sp),
+              padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
               elevation: 6,
               shadowColor: WebsiteColors.primaryBlueColor.withOpacity(0.4),
             ),
           ),
-          SizedBox(height: 30.sp),
+          SizedBox(height: 30),
           if (widget.imageUrls.isNotEmpty)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,13 +215,13 @@ class _AddEventFormState extends State<AddEventForm> {
                 Text(
                   'Added Images:',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontSize: 25.sp,
+                    fontSize: 25,
                     color: WebsiteColors.primaryBlueColor,
                   ),
                 ),
-                SizedBox(height: 10.sp),
+                SizedBox(height: 10),
                 ...widget.imageUrls.map(
-                      (url) => Card(
+                  (url) => Card(
                     margin: const EdgeInsets.symmetric(vertical: 8),
                     elevation: 5,
                     shape: RoundedRectangleBorder(
@@ -224,11 +230,12 @@ class _AddEventFormState extends State<AddEventForm> {
                     child: ListTile(
                       leading: Image.network(
                         url,
-                        width: 80.sp,
-                        height: 100.sp,
+                        width: 80,
+                        height: 100,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.broken_image),
+                        errorBuilder:
+                            (context, error, stackTrace) =>
+                                const Icon(Icons.broken_image),
                       ),
                       title: Text(url),
                       trailing: IconButton(
@@ -242,7 +249,7 @@ class _AddEventFormState extends State<AddEventForm> {
                 ),
               ],
             ),
-          SizedBox(height: 30.sp),
+          SizedBox(height: 30),
           CustomTextFormField(
             controller: widget.locationController,
             labelText: 'Location',
@@ -250,7 +257,7 @@ class _AddEventFormState extends State<AddEventForm> {
             keyboardType: TextInputType.text,
             onChanged: (value) {},
           ),
-          SizedBox(height: 30.sp),
+          SizedBox(height: 30),
           CustomTextFormField(
             controller: widget.timeController,
             labelText: 'Time (e.g. 3:00 PM)',
@@ -258,7 +265,7 @@ class _AddEventFormState extends State<AddEventForm> {
             keyboardType: TextInputType.datetime,
             onChanged: (value) {},
           ),
-          SizedBox(height: 30.sp),
+          SizedBox(height: 30),
           CustomDatePicker(
             initialDate: selectedDate,
             onDatePicked: (newDateTime) {
@@ -267,24 +274,25 @@ class _AddEventFormState extends State<AddEventForm> {
               });
             },
           ),
-          SizedBox(height: 30.sp),
+          SizedBox(height: 30),
           Container(
             decoration: BoxDecoration(
               color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(10.sp),
+              borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: isOnlineEvent
-                    ? WebsiteColors.darkBlueColor
-                    : Colors.grey[400]!,
+                color:
+                    isOnlineEvent
+                        ? WebsiteColors.darkBlueColor
+                        : Colors.grey[400]!,
                 width: 1,
               ),
             ),
-            padding: EdgeInsets.symmetric(vertical: 8.sp, horizontal: 12.sp),
+            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
             child: SwitchListTile(
               title: Text(
                 'Is Online Event?',
                 style: TextStyle(
-                  fontSize: 22.sp,
+                  fontSize: 22,
                   fontWeight: FontWeight.w500,
                   color: WebsiteColors.primaryBlueColor,
                 ),
@@ -311,17 +319,20 @@ class _AddEventFormState extends State<AddEventForm> {
             ),
           ),
           if (isOnlineEvent) ...[
-            SizedBox(height: 30.sp),
+            SizedBox(height: 30),
             CustomTextFormField(
               controller: appTimeController,
               labelText: 'Exact Time (e.g., 3:00 PM)',
               icon: Icons.access_time,
               keyboardType: TextInputType.datetime,
               onChanged: (value) {},
-              validator: (value) =>
-              value == null || value.isEmpty ? 'Enter the exact time' : null,
+              validator:
+                  (value) =>
+                      value == null || value.isEmpty
+                          ? 'Enter the exact time'
+                          : null,
             ),
-            SizedBox(height: 30.sp),
+            SizedBox(height: 30),
             CustomTextFormField(
               controller: appUrlController,
               labelText: 'Pre-URL (Optional)',
@@ -329,13 +340,15 @@ class _AddEventFormState extends State<AddEventForm> {
               keyboardType: TextInputType.url,
               onChanged: (value) {},
             ),
-            SizedBox(height: 30.sp),
+            SizedBox(height: 30),
             DropdownButtonFormField<String>(
               value: selectedApp,
-              items: ['Zoom', 'Microsoft Teams', 'Google Meet', 'Other']
-                  .map((app) {
-                return DropdownMenuItem(value: app, child: Text(app));
-              }).toList(),
+              items:
+                  ['Zoom', 'Microsoft Teams', 'Google Meet', 'Other'].map((
+                    app,
+                  ) {
+                    return DropdownMenuItem(value: app, child: Text(app));
+                  }).toList(),
               onChanged: (value) {
                 setState(() {
                   selectedApp = value;
@@ -346,31 +359,39 @@ class _AddEventFormState extends State<AddEventForm> {
               },
               decoration: InputDecoration(
                 labelText: 'Select App Hosting',
-                labelStyle: TextStyle(fontSize: 25.sp,color: WebsiteColors.darkBlueColor),
+                labelStyle: TextStyle(
+                  fontSize: 25,
+                  color: WebsiteColors.darkBlueColor,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              validator: (value) =>
-              value == null || value.isEmpty
-                  ? 'Select an app hosting option'
-                  : null,
+              validator:
+                  (value) =>
+                      value == null || value.isEmpty
+                          ? 'Select an app hosting option'
+                          : null,
             ),
             if (selectedApp == 'Other') ...[
-              SizedBox(height: 30.sp),
+              SizedBox(height: 30),
               CustomTextFormField(
                 controller: appNameController,
                 labelText: 'App Name',
                 icon: Icons.apps,
                 keyboardType: TextInputType.text,
                 onChanged: (value) {},
-                validator: (value) =>
-                value == null || value.isEmpty ? 'Enter app name' : null,
+                validator:
+                    (value) =>
+                        value == null || value.isEmpty
+                            ? 'Enter app name'
+                            : null,
               ),
             ],
           ],
           if (!isOnlineEvent) ...[
-            if (selectedDate != null && selectedDate!.isAfter(DateTime.now())) ...[
+            if (selectedDate != null &&
+                selectedDate!.isAfter(DateTime.now())) ...[
               SwitchListTile(
                 title: const Text('Are Tickets Available?'),
                 value: isTicketAvailable,
@@ -384,7 +405,7 @@ class _AddEventFormState extends State<AddEventForm> {
                 },
               ),
               if (isTicketAvailable) ...[
-                SizedBox(height: 30.sp),
+                SizedBox(height: 30),
                 SwitchListTile(
                   title: const Text('Are Tickets Limited?'),
                   value: isTicketLimited,
@@ -412,29 +433,33 @@ class _AddEventFormState extends State<AddEventForm> {
                       return null;
                     },
                   ),
-                SizedBox(height: 30.sp),
+                SizedBox(height: 30),
                 CustomTextFormField(
                   controller: widget.ticketPriceController,
                   labelText: 'Ticket Price',
                   icon: Icons.attach_money,
                   keyboardType: TextInputType.number,
                   onChanged: (value) {},
-                  validator: (value) =>
-                  value == null || value.isEmpty ? 'Enter ticket price' : null,
+                  validator:
+                      (value) =>
+                          value == null || value.isEmpty
+                              ? 'Enter ticket price'
+                              : null,
                 ),
-                SizedBox(height: 30.sp),
+                SizedBox(height: 30),
                 CustomTextFormField(
                   controller: widget.discountController,
                   labelText: 'Discount (%)',
                   icon: Icons.discount,
                   keyboardType: TextInputType.number,
                   onChanged: (value) {},
-                  validator: (value) =>
-                  value == null || value.isEmpty
-                      ? 'Enter discount percentage'
-                      : null,
+                  validator:
+                      (value) =>
+                          value == null || value.isEmpty
+                              ? 'Enter discount percentage'
+                              : null,
                 ),
-                SizedBox(height: 30.sp),
+                SizedBox(height: 30),
                 CustomTextFormField(
                   controller: widget.discountForController,
                   labelText: 'Discount For (e.g., Students)',
@@ -442,7 +467,7 @@ class _AddEventFormState extends State<AddEventForm> {
                   keyboardType: TextInputType.text,
                   onChanged: (value) {},
                 ),
-                SizedBox(height: 30.sp),
+                SizedBox(height: 30),
                 SwitchListTile(
                   title: const Text('Is Bus Available?'),
                   value: isBusAvailable,
@@ -453,7 +478,7 @@ class _AddEventFormState extends State<AddEventForm> {
                   },
                 ),
                 if (isBusAvailable) ...[
-                  SizedBox(height: 30.sp),
+                  SizedBox(height: 30),
                   CustomTextFormField(
                     controller: TextEditingController(
                       text: widget.numberOfBuses?.toString() ?? '',
@@ -471,7 +496,7 @@ class _AddEventFormState extends State<AddEventForm> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 30.sp),
+                  SizedBox(height: 30),
                   CustomTextFormField(
                     controller: TextEditingController(
                       text: widget.seatsPerBus?.toString() ?? '',
@@ -489,101 +514,117 @@ class _AddEventFormState extends State<AddEventForm> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 30.sp),
+                  SizedBox(height: 30),
                   CustomTextFormField(
                     controller: widget.busTicketPriceController,
                     labelText: 'Bus Ticket Price Per Seat',
                     icon: Icons.directions_bus,
                     keyboardType: TextInputType.number,
                     onChanged: (value) {},
-                    validator: (value) =>
-                    value == null || value.isEmpty
-                        ? 'Enter bus ticket price'
-                        : null,
+                    validator:
+                        (value) =>
+                            value == null || value.isEmpty
+                                ? 'Enter bus ticket price'
+                                : null,
                   ),
-                  SizedBox(height: 30.sp),
+                  SizedBox(height: 30),
                   CustomTextFormField(
                     controller: widget.busSourceController,
                     labelText: 'Bus Departure Location',
                     icon: Icons.location_on,
                     keyboardType: TextInputType.text,
                     onChanged: (value) {},
-                    validator: (value) =>
-                    value == null || value.isEmpty
-                        ? 'Enter departure location'
-                        : null,
+                    validator:
+                        (value) =>
+                            value == null || value.isEmpty
+                                ? 'Enter departure location'
+                                : null,
                   ),
-                  SizedBox(height: 30.sp),
+                  SizedBox(height: 30),
                   CustomTextFormField(
                     controller: widget.busDestinationController,
                     labelText: 'Bus Destination',
                     icon: Icons.location_on,
                     keyboardType: TextInputType.text,
                     onChanged: (value) {},
-                    validator: (value) =>
-                    value == null || value.isEmpty ? 'Enter destination' : null,
+                    validator:
+                        (value) =>
+                            value == null || value.isEmpty
+                                ? 'Enter destination'
+                                : null,
                   ),
-                  SizedBox(height: 30.sp),
+                  SizedBox(height: 30),
                   CustomTextFormField(
                     controller: widget.busDepartureTimeController,
                     labelText: 'Bus Departure Time',
                     icon: Icons.access_time,
                     keyboardType: TextInputType.datetime,
                     onChanged: (value) {},
-                    validator: (value) =>
-                    value == null || value.isEmpty
-                        ? 'Enter departure time'
-                        : null,
+                    validator:
+                        (value) =>
+                            value == null || value.isEmpty
+                                ? 'Enter departure time'
+                                : null,
                   ),
-                  SizedBox(height: 30.sp),
+                  SizedBox(height: 30),
                   CustomTextFormField(
                     controller: widget.busArrivalTimeController,
                     labelText: 'Bus Arrival Time',
                     icon: Icons.access_time,
                     keyboardType: TextInputType.datetime,
                     onChanged: (value) {},
-                    validator: (value) =>
-                    value == null || value.isEmpty ? 'Enter arrival time' : null,
+                    validator:
+                        (value) =>
+                            value == null || value.isEmpty
+                                ? 'Enter arrival time'
+                                : null,
                   ),
-                  SizedBox(height: 30.sp),
+                  SizedBox(height: 30),
                   CustomTextFormField(
                     controller: widget.tripExplanationController,
                     labelText: 'Program Details',
                     icon: Icons.info,
                     keyboardType: TextInputType.text,
                     onChanged: (value) {},
-                    validator: (value) =>
-                    value == null || value.isEmpty
-                        ? 'Enter program details'
-                        : null,
+                    validator:
+                        (value) =>
+                            value == null || value.isEmpty
+                                ? 'Enter program details'
+                                : null,
                   ),
                 ],
               ],
             ],
           ],
-          SizedBox(height: 30.sp),
+          SizedBox(height: 30),
           CustomTextFormField(
             controller: widget.contactNumberController,
             labelText: 'Contact Number',
             icon: Icons.phone,
             keyboardType: TextInputType.phone,
             onChanged: (value) {},
-            validator: (value) =>
-            value == null || value.isEmpty ? 'Enter contact number' : null,
+            validator:
+                (value) =>
+                    value == null || value.isEmpty
+                        ? 'Enter contact number'
+                        : null,
           ),
-          SizedBox(height: 30.sp),
+          SizedBox(height: 30),
           CustomTextFormField(
             controller: widget.contactEmailController,
             labelText: 'Contact Email',
             icon: Icons.email,
             keyboardType: TextInputType.emailAddress,
             onChanged: (value) {},
-            validator: (value) =>
-            value == null || value.isEmpty ? 'Enter contact email' : null,
+            validator:
+                (value) =>
+                    value == null || value.isEmpty
+                        ? 'Enter contact email'
+                        : null,
           ),
-          SizedBox(height: 40.sp),
+          SizedBox(height: 40),
           ConstrainedBox(
-            constraints: BoxConstraints.tightFor(width: 220.sp),
+            constraints: BoxConstraints.tightFor(width: 220),
             child: ElevatedButton(
               onPressed: () async {
                 if (!widget.formKey.currentState!.validate()) {
@@ -591,7 +632,7 @@ class _AddEventFormState extends State<AddEventForm> {
                     SnackBar(
                       content: Text(
                         'Please fill all required fields.',
-                        style: TextStyle(fontSize: 18.sp),
+                        style: TextStyle(fontSize: 18),
                       ),
                       backgroundColor: Colors.redAccent,
                     ),
@@ -644,28 +685,26 @@ class _AddEventFormState extends State<AddEventForm> {
                   selectedApp: selectedApp,
                 );
               },
-              child: widget.isLoading
-                  ? const CircularProgressIndicator(
-                color: WebsiteColors.whiteColor,
-              )
-                  : Text(
-                'Add Event',
-                style: TextStyle(
-                  color: WebsiteColors.whiteColor,
-                  fontSize: 24.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              child:
+                  widget.isLoading
+                      ? const CircularProgressIndicator(
+                        color: WebsiteColors.whiteColor,
+                      )
+                      : Text(
+                        'Add Event',
+                        style: TextStyle(
+                          color: WebsiteColors.whiteColor,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: WebsiteColors.primaryBlueColor,
                 foregroundColor: WebsiteColors.whiteColor,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16.sp),
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                padding: EdgeInsets.symmetric(
-                  vertical: 16.sp,
-                  horizontal: 24.sp,
-                ),
+                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                 elevation: 6,
                 shadowColor: WebsiteColors.primaryBlueColor.withOpacity(0.4),
               ),

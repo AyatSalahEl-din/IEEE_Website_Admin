@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ieee_website/Themes/website_colors.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -32,7 +31,7 @@ class _ManageRequestsWidgetState extends State<ManageRequestsWidget> {
             children: [
               // Search and Filter Row
               Padding(
-                padding: EdgeInsets.all(16.sp),
+                padding: EdgeInsets.all(16),
                 child: Row(
                   children: [
                     Expanded(
@@ -42,10 +41,10 @@ class _ManageRequestsWidgetState extends State<ManageRequestsWidget> {
                           hintText: 'Search requests...',
                           hintStyle: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(color: WebsiteColors.greyColor),
-                          prefixIcon: Icon(Icons.search, size: 30.sp),
+                          prefixIcon: Icon(Icons.search, size: 30),
                           filled: true,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.sp),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
                           ),
                         ),
@@ -55,38 +54,38 @@ class _ManageRequestsWidgetState extends State<ManageRequestsWidget> {
                             ),
                       ),
                     ),
-                    SizedBox(width: 10.sp),
+                    SizedBox(width: 10),
                     DropdownButton<String>(
                       value: _selectedStatus,
                       dropdownColor: Colors.white, // White dropdown background
                       style: TextStyle(
-                        fontSize: 25.sp,
+                        fontSize: 25,
                         color: WebsiteColors.darkBlueColor,
                       ),
                       items: [
                         DropdownMenuItem(
                           value: 'All',
-                          child: Text('All', style: TextStyle(fontSize: 25.sp)),
+                          child: Text('All', style: TextStyle(fontSize: 25)),
                         ),
                         DropdownMenuItem(
                           value: 'pending',
                           child: Text(
                             'Pending',
-                            style: TextStyle(fontSize: 25.sp),
+                            style: TextStyle(fontSize: 25),
                           ),
                         ),
                         DropdownMenuItem(
                           value: 'approved',
                           child: Text(
                             'Approved',
-                            style: TextStyle(fontSize: 25.sp),
+                            style: TextStyle(fontSize: 25),
                           ),
                         ),
                         DropdownMenuItem(
                           value: 'rejected',
                           child: Text(
                             'Rejected',
-                            style: TextStyle(fontSize: 25.sp),
+                            style: TextStyle(fontSize: 25),
                           ),
                         ),
                       ],
@@ -129,7 +128,7 @@ class _ManageRequestsWidgetState extends State<ManageRequestsWidget> {
           return Center(
             child: Text(
               "No requests found.",
-              style: TextStyle(fontSize: 30.sp),
+              style: TextStyle(fontSize: 30),
             ),
           );
         }
@@ -157,7 +156,7 @@ class _ManageRequestsWidgetState extends State<ManageRequestsWidget> {
           return Center(
             child: Text(
               "No matching requests found.",
-              style: TextStyle(fontSize: 30.sp),
+              style: TextStyle(fontSize: 30),
             ),
           );
         }
@@ -165,12 +164,12 @@ class _ManageRequestsWidgetState extends State<ManageRequestsWidget> {
         final crossAxisCount = (constraints.maxWidth / 200).floor().clamp(1, 5);
 
         return GridView.builder(
-          padding: EdgeInsets.all(8.sp),
+          padding: EdgeInsets.all(8),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
-            crossAxisSpacing: 8.sp,
-            mainAxisSpacing: 8.sp,
-            childAspectRatio: 1, // Square cards
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
+            childAspectRatio: 0.7, // Square cards
           ),
           itemCount: filteredRequests.length,
           itemBuilder: (context, index) {
@@ -195,11 +194,11 @@ class _ManageRequestsWidgetState extends State<ManageRequestsWidget> {
 
     return Card(
       color: Colors.white, // White background for the card
-      elevation: 2,
-      margin: EdgeInsets.all(4.sp),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
+      elevation: 6,
+      margin: EdgeInsets.all(4),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: Padding(
-        padding: EdgeInsets.all(10.sp),
+        padding: EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -209,7 +208,7 @@ class _ManageRequestsWidgetState extends State<ManageRequestsWidget> {
               children: [
                 // Delete button
                 IconButton(
-                  icon: Icon(Icons.delete, size: 18.sp),
+                  icon: Icon(Icons.delete, size: 18),
                   color: Colors.red,
                   padding: EdgeInsets.zero,
                   constraints: BoxConstraints(),
@@ -218,17 +217,17 @@ class _ManageRequestsWidgetState extends State<ManageRequestsWidget> {
                 // Status badge
                 Container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: 8.sp,
-                    vertical: 2.sp,
+                    horizontal: 8,
+                    vertical: 2,
                   ),
                   decoration: BoxDecoration(
                     color: _getStatusColor(data['status']),
-                    borderRadius: BorderRadius.circular(8.sp),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     (data['status'] ?? 'pending').toString().toUpperCase(),
                     style: TextStyle(
-                      fontSize: 12.sp,
+                      fontSize: 12,
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
@@ -236,31 +235,31 @@ class _ManageRequestsWidgetState extends State<ManageRequestsWidget> {
                 ),
               ],
             ),
-            SizedBox(height: 6.sp),
+            SizedBox(height: 6),
 
             // Order number
             Text(
               'Order Number: ${data['orderNumber'] ?? 'N/A'}',
               style: TextStyle(
-                fontSize: 14.sp,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
                 color: WebsiteColors.primaryBlueColor,
               ),
             ),
-            SizedBox(height: 8.sp),
+            SizedBox(height: 8),
 
             // Event name
             Text(
               data['eventName'] ?? 'No Event',
               style: TextStyle(
-                fontSize: 16.sp,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: WebsiteColors.primaryBlueColor,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            SizedBox(height: 8.sp),
+            SizedBox(height: 8),
 
             // User details
             _buildDetailRow(
@@ -277,7 +276,7 @@ class _ManageRequestsWidgetState extends State<ManageRequestsWidget> {
               Icons.email_outlined,
               data['userEmail'] ?? 'No Email',
             ),
-            SizedBox(height: 8.sp),
+            SizedBox(height: 8),
 
             // Event details
             _buildDetailRow(
@@ -317,7 +316,7 @@ class _ManageRequestsWidgetState extends State<ManageRequestsWidget> {
                     ),
                   ),
                 ),
-                SizedBox(width: 4.sp),
+                SizedBox(width: 4),
                 Expanded(
                   child: _buildActionButton(
                     'UNPAID',
@@ -348,22 +347,22 @@ class _ManageRequestsWidgetState extends State<ManageRequestsWidget> {
     Map<String, dynamic>? phoneData,
   }) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 2.sp),
+      padding: EdgeInsets.symmetric(vertical: 2),
       child: InkWell(
         onTap: isPhone ? () => _launchPhoneConfirmation(phoneData!) : null,
         child: Row(
           children: [
             Icon(
               icon,
-              size: 16.sp,
+              size: 16,
               color: isPhone ? Colors.green : WebsiteColors.primaryBlueColor,
             ),
-            SizedBox(width: 4.sp),
+            SizedBox(width: 4),
             Expanded(
               child: Text(
                 text,
                 style: TextStyle(
-                  fontSize: 16.sp,
+                  fontSize: 16,
                   color: isPhone ? Colors.blue : WebsiteColors.darkBlueColor,
                   fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
                   decoration: isPhone ? TextDecoration.underline : null,
@@ -382,15 +381,15 @@ class _ManageRequestsWidgetState extends State<ManageRequestsWidget> {
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4.sp),
+          borderRadius: BorderRadius.circular(4),
         ),
-        padding: EdgeInsets.symmetric(vertical: 4.sp),
-        minimumSize: Size(0, 28.sp),
+        padding: EdgeInsets.symmetric(vertical: 4),
+        minimumSize: Size(0, 28),
       ),
       child: Text(
         text,
         style: TextStyle(
-          fontSize: 12.sp,
+          fontSize: 12,
           color: Colors.white,
           fontWeight: FontWeight.bold,
         ),
