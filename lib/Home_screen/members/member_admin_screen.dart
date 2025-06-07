@@ -56,9 +56,8 @@ class _MemberAdminScreenState extends State<MemberAdminScreen> {
 
     await LayoutConfig.saveRowSizes(sizes);
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text("Row layout saved successfully!")));
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Row layout saved successfully!")));
 
     _loadRowSizes(); // Refresh
   }
@@ -90,35 +89,32 @@ class _MemberAdminScreenState extends State<MemberAdminScreen> {
   void _confirmDelete(TeamMember member) {
     showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text("Confirm Delete"),
-            content: Text('Are you sure you want to delete "${member.name}"?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text("No"),
-              ),
-              TextButton(
-                onPressed: () async {
-                  Navigator.of(context).pop(); // Close dialog first
-                  await Future.delayed(
-                    Duration(milliseconds: 100),
-                  ); // Let UI settle
-                  await _deleteMember(member.id); // Delete member
-
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('${member.name} deleted successfully'),
-                      ),
-                    );
-                  }
-                },
-                child: Text("Yes"),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        title: Text("Confirm Delete"),
+        content: Text('Are you sure you want to delete "${member.name}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text("No"),
           ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop(); // Close dialog first
+              await Future.delayed(Duration(milliseconds: 100)); // Let UI settle
+              await _deleteMember(member.id); // Delete member
+
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('${member.name} deleted successfully'),
+                  ),
+                );
+              }
+            },
+            child: Text("Yes"),
+          ),
+        ],
+      ),
     );
   }
 
@@ -129,8 +125,8 @@ class _MemberAdminScreenState extends State<MemberAdminScreen> {
         title: Text(
           "Manage Team Members",
           style: Theme.of(context).textTheme.displaySmall?.copyWith(
-            color: WebsiteColors.primaryBlueColor,
-          ),
+                color: WebsiteColors.primaryBlueColor,
+              ),
         ),
       ),
       body: SingleChildScrollView(
@@ -154,8 +150,8 @@ class _MemberAdminScreenState extends State<MemberAdminScreen> {
                     child: Text(
                       "Set Rows",
                       style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                        color: WebsiteColors.primaryBlueColor,
-                      ),
+                            color: WebsiteColors.primaryBlueColor,
+                          ),
                     ),
                   ),
                 ],
@@ -189,66 +185,55 @@ class _MemberAdminScreenState extends State<MemberAdminScreen> {
               ),
             SizedBox(height: 10),
             StreamBuilder<QuerySnapshot>(
-              stream:
-                  FirebaseFirestore.instance
-                      .collection('Members')
-                      .orderBy('number')
-                      .snapshots(),
+              stream: FirebaseFirestore.instance
+                  .collection('Members')
+                  .orderBy('number')
+                  .snapshots(),
               builder: (context, snapshot) {
-                if (!snapshot.hasData)
+                if (!snapshot.hasData) {
                   return Center(child: CircularProgressIndicator());
-
-                List<TeamMember> members =
-                    snapshot.data!.docs.map((doc) {
-                      return TeamMember.fromFirestore(
-                        doc.id,
-                        doc.data() as Map<String, dynamic>,
-                      );
-                    }).toList();
-
-                List<List<TeamMember>> rows = [];
-                int startIndex = 0;
-                for (int size in rowSizes) {
-                  if (startIndex >= members.length) break;
-                  int endIndex = (startIndex + size).clamp(0, members.length);
-                  rows.add(members.sublist(startIndex, endIndex));
-                  startIndex = endIndex;
                 }
 
-                return SingleChildScrollView(
-                  child: Column(
-                    children:
-                        rows.map((row) {
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children:
-                                row.map((member) {
-                                  return Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Flexible(
-                                      flex:
-                                          1, // Adjust this flex value if needed
-                                      child: AdminTeamMemberCard(
-                                        member: member,
-                                        onEdit: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder:
-                                                  (_) => MemberEditScreen(
-                                                    member: member,
-                                                  ),
-                                            ),
-                                          );
-                                        },
-                                        onDelete: () => _confirmDelete(member),
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
+                List<TeamMember> members = snapshot.data!.docs.map((doc) {
+                  return TeamMember.fromFirestore(
+                    doc.id,
+                    doc.data() as Map<String, dynamic>,
+                  );
+                }).toList();
+
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    double screenWidth = constraints.maxWidth;
+                    double itemWidth = 300; // approximate card width
+                    int itemsPerRow =
+                        (screenWidth / itemWidth).floor().clamp(1, 4);
+
+                    return Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Wrap(
+                        spacing: 16,
+                        runSpacing: 16,
+                        children: members.map((member) {
+                          return SizedBox(
+                            width: screenWidth / itemsPerRow - 16,
+                            child: AdminTeamMemberCard(
+                              member: member,
+                              onEdit: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => MemberEditScreen(
+                                        member: member),
+                                  ),
+                                );
+                              },
+                              onDelete: () => _confirmDelete(member),
+                            ),
                           );
                         }).toList(),
-                  ),
+                      ),
+                    );
+                  },
                 );
               },
             ),
